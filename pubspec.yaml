@@ -1,0 +1,83 @@
+name: cardx
+description: "A trading platform for collectible cards - Pokemon, MTG, Yu-Gi-Oh!"
+publish_to: 'none'
+
+version: 1.0.0+1
+
+environment:
+  sdk: '>=3.2.3 <4.0.0'
+
+dependencies:
+  flutter:
+    sdk: flutter
+
+  # Firebase
+  firebase_core: ^3.14.0
+  firebase_auth: ^5.6.0
+  cloud_firestore: ^5.6.9
+  firebase_storage: ^12.4.7
+  cloud_functions: ^5.5.2
+  
+  # Estado y Navegación
+  flutter_riverpod: ^2.4.9
+  riverpod_annotation: ^2.3.3
+  go_router: ^16.0.0
+  
+  # UI/UX
+  cached_network_image: ^3.3.0
+  shimmer: ^3.0.0
+  flutter_svg: ^2.0.9
+  google_fonts: ^6.1.0
+  fl_chart: ^1.0.0
+  
+  # Base de datos local
+  sqflite: ^2.3.0
+  path: ^1.8.3
+  
+  # Serialización JSON
+  json_annotation: ^4.8.1
+  freezed_annotation: ^3.0.0
+  
+  # Exportación de datos
+  csv: ^6.0.0
+  path_provider: ^2.1.1
+  # share_plus: ^7.2.1  # Comentado por problemas de compatibilidad
+  
+  # Utilidades
+  intl: ^0.20.2
+  image_picker: ^1.0.4
+  uuid: ^4.2.1
+  
+  # Pagos (comentado por ahora)
+  # stripe_flutter: ^9.4.0
+  
+  # Autenticación social
+  google_sign_in: ^7.0.0
+  sign_in_with_apple: ^7.0.1
+  flutter_facebook_auth: ^7.1.2
+  
+  # Cupertino Icons
+  cupertino_icons: ^1.0.2
+  hive: ^2.0.4
+  hive_flutter: ^1.1.0
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  
+  # Generación de código
+  json_serializable: ^6.7.1
+  freezed: ^3.0.6
+  build_runner: ^2.4.7
+  riverpod_generator: ^2.3.9
+  
+  # Linting
+  flutter_lints: ^6.0.0
+
+flutter:
+  uses-material-design: true
+  
+  assets:
+    - assets/images/
+    - assets/icons/
+    - assets/data/ 
