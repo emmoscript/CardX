@@ -1,9 +1,6 @@
 // Temporarily converted to regular class to fix Freezed issues
 // import 'package:freezed_annotation/freezed_annotation.dart';
 
-// part 'user.freezed.dart';
-// part 'user.g.dart';
-
 class User {
   final String id;
   final String email;
@@ -110,19 +107,17 @@ class User {
 
   @override
   int get hashCode {
-    return Object.hash(
-      id,
-      email,
-      displayName,
-      photoURL,
-      collectionValue,
-      totalCards,
-      joinDate,
-      preferences,
-      location,
-      createdAt,
-      updatedAt,
-    );
+    return id.hashCode ^
+        email.hashCode ^
+        displayName.hashCode ^
+        photoURL.hashCode ^
+        collectionValue.hashCode ^
+        totalCards.hashCode ^
+        joinDate.hashCode ^
+        preferences.hashCode ^
+        location.hashCode ^
+        createdAt.hashCode ^
+        updatedAt.hashCode;
   }
 
   @override

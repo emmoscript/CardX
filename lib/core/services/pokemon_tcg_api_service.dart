@@ -77,6 +77,8 @@ class PokemonTcgApiService {
         
         if (cards.isNotEmpty) {
           print('First card: ${cards.first['name']} (${cards.first['id']})');
+        } else {
+          print('No cards found in response');
         }
         
         return List<Map<String, dynamic>>.from(cards);
@@ -103,6 +105,13 @@ class PokemonTcgApiService {
       );
       
       print('Pokémon TCG API - Retrieved ${cards.length} popular cards');
+      
+      // If no cards found, try a more general search
+      if (cards.isEmpty) {
+        print('No popular cards found, trying general search...');
+        return await searchCards(pageSize: 10);
+      }
+      
       return cards;
     } catch (e) {
       print('Exception getting popular cards: $e');

@@ -25,9 +25,11 @@ _Auction _$AuctionFromJson(Map<String, dynamic> json) => _Auction(
       tcg: json['tcg'] as String,
       images:
           (json['images'] as List<dynamic>?)?.map((e) => e as String).toList(),
+      imageUrl: json['imageUrl'] as String?,
       condition: json['condition'] as String?,
       rarity: json['rarity'] as String?,
       cardSet: json['cardSet'] as String?,
+      setName: json['setName'] as String?,
       language: json['language'] as String?,
       bids: (json['bids'] as List<dynamic>?)
           ?.map((e) => Bid.fromJson(e as Map<String, dynamic>))
@@ -35,8 +37,12 @@ _Auction _$AuctionFromJson(Map<String, dynamic> json) => _Auction(
       winnerId: json['winnerId'] as String?,
       winnerName: json['winnerName'] as String?,
       totalBids: (json['totalBids'] as num?)?.toInt(),
+      bidCount: (json['bidCount'] as num?)?.toInt(),
       views: (json['views'] as num?)?.toInt(),
       isWatched: json['isWatched'] as bool?,
+      sellerJoinDate: json['sellerJoinDate'] == null
+          ? null
+          : DateTime.parse(json['sellerJoinDate'] as String),
       createdAt: json['createdAt'] == null
           ? null
           : DateTime.parse(json['createdAt'] as String),
@@ -63,16 +69,20 @@ Map<String, dynamic> _$AuctionToJson(_Auction instance) => <String, dynamic>{
       'type': _$AuctionTypeEnumMap[instance.type]!,
       'tcg': instance.tcg,
       'images': instance.images,
+      'imageUrl': instance.imageUrl,
       'condition': instance.condition,
       'rarity': instance.rarity,
       'cardSet': instance.cardSet,
+      'setName': instance.setName,
       'language': instance.language,
       'bids': instance.bids,
       'winnerId': instance.winnerId,
       'winnerName': instance.winnerName,
       'totalBids': instance.totalBids,
+      'bidCount': instance.bidCount,
       'views': instance.views,
       'isWatched': instance.isWatched,
+      'sellerJoinDate': instance.sellerJoinDate?.toIso8601String(),
       'createdAt': instance.createdAt?.toIso8601String(),
       'updatedAt': instance.updatedAt?.toIso8601String(),
     };

@@ -32,16 +32,20 @@ mixin _$Auction {
   AuctionType get type;
   String get tcg;
   List<String>? get images;
+  String? get imageUrl;
   String? get condition;
   String? get rarity;
   String? get cardSet;
+  String? get setName;
   String? get language;
   List<Bid>? get bids;
   String? get winnerId;
   String? get winnerName;
   int? get totalBids;
+  int? get bidCount;
   int? get views;
   bool? get isWatched;
+  DateTime? get sellerJoinDate;
   DateTime? get createdAt;
   DateTime? get updatedAt;
 
@@ -86,10 +90,13 @@ mixin _$Auction {
             (identical(other.type, type) || other.type == type) &&
             (identical(other.tcg, tcg) || other.tcg == tcg) &&
             const DeepCollectionEquality().equals(other.images, images) &&
+            (identical(other.imageUrl, imageUrl) ||
+                other.imageUrl == imageUrl) &&
             (identical(other.condition, condition) ||
                 other.condition == condition) &&
             (identical(other.rarity, rarity) || other.rarity == rarity) &&
             (identical(other.cardSet, cardSet) || other.cardSet == cardSet) &&
+            (identical(other.setName, setName) || other.setName == setName) &&
             (identical(other.language, language) ||
                 other.language == language) &&
             const DeepCollectionEquality().equals(other.bids, bids) &&
@@ -99,9 +106,13 @@ mixin _$Auction {
                 other.winnerName == winnerName) &&
             (identical(other.totalBids, totalBids) ||
                 other.totalBids == totalBids) &&
+            (identical(other.bidCount, bidCount) ||
+                other.bidCount == bidCount) &&
             (identical(other.views, views) || other.views == views) &&
             (identical(other.isWatched, isWatched) ||
                 other.isWatched == isWatched) &&
+            (identical(other.sellerJoinDate, sellerJoinDate) ||
+                other.sellerJoinDate == sellerJoinDate) &&
             (identical(other.createdAt, createdAt) ||
                 other.createdAt == createdAt) &&
             (identical(other.updatedAt, updatedAt) ||
@@ -129,23 +140,27 @@ mixin _$Auction {
         type,
         tcg,
         const DeepCollectionEquality().hash(images),
+        imageUrl,
         condition,
         rarity,
         cardSet,
+        setName,
         language,
         const DeepCollectionEquality().hash(bids),
         winnerId,
         winnerName,
         totalBids,
+        bidCount,
         views,
         isWatched,
+        sellerJoinDate,
         createdAt,
         updatedAt
       ]);
 
   @override
   String toString() {
-    return 'Auction(id: $id, title: $title, description: $description, card: $card, sellerId: $sellerId, sellerName: $sellerName, sellerAvatar: $sellerAvatar, startingPrice: $startingPrice, currentPrice: $currentPrice, reservePrice: $reservePrice, buyNowPrice: $buyNowPrice, startTime: $startTime, endTime: $endTime, status: $status, type: $type, tcg: $tcg, images: $images, condition: $condition, rarity: $rarity, cardSet: $cardSet, language: $language, bids: $bids, winnerId: $winnerId, winnerName: $winnerName, totalBids: $totalBids, views: $views, isWatched: $isWatched, createdAt: $createdAt, updatedAt: $updatedAt)';
+    return 'Auction(id: $id, title: $title, description: $description, card: $card, sellerId: $sellerId, sellerName: $sellerName, sellerAvatar: $sellerAvatar, startingPrice: $startingPrice, currentPrice: $currentPrice, reservePrice: $reservePrice, buyNowPrice: $buyNowPrice, startTime: $startTime, endTime: $endTime, status: $status, type: $type, tcg: $tcg, images: $images, imageUrl: $imageUrl, condition: $condition, rarity: $rarity, cardSet: $cardSet, setName: $setName, language: $language, bids: $bids, winnerId: $winnerId, winnerName: $winnerName, totalBids: $totalBids, bidCount: $bidCount, views: $views, isWatched: $isWatched, sellerJoinDate: $sellerJoinDate, createdAt: $createdAt, updatedAt: $updatedAt)';
   }
 }
 
@@ -172,16 +187,20 @@ abstract mixin class $AuctionCopyWith<$Res> {
       AuctionType type,
       String tcg,
       List<String>? images,
+      String? imageUrl,
       String? condition,
       String? rarity,
       String? cardSet,
+      String? setName,
       String? language,
       List<Bid>? bids,
       String? winnerId,
       String? winnerName,
       int? totalBids,
+      int? bidCount,
       int? views,
       bool? isWatched,
+      DateTime? sellerJoinDate,
       DateTime? createdAt,
       DateTime? updatedAt});
 }
@@ -215,16 +234,20 @@ class _$AuctionCopyWithImpl<$Res> implements $AuctionCopyWith<$Res> {
     Object? type = null,
     Object? tcg = null,
     Object? images = freezed,
+    Object? imageUrl = freezed,
     Object? condition = freezed,
     Object? rarity = freezed,
     Object? cardSet = freezed,
+    Object? setName = freezed,
     Object? language = freezed,
     Object? bids = freezed,
     Object? winnerId = freezed,
     Object? winnerName = freezed,
     Object? totalBids = freezed,
+    Object? bidCount = freezed,
     Object? views = freezed,
     Object? isWatched = freezed,
+    Object? sellerJoinDate = freezed,
     Object? createdAt = freezed,
     Object? updatedAt = freezed,
   }) {
@@ -297,6 +320,10 @@ class _$AuctionCopyWithImpl<$Res> implements $AuctionCopyWith<$Res> {
           ? _self.images
           : images // ignore: cast_nullable_to_non_nullable
               as List<String>?,
+      imageUrl: freezed == imageUrl
+          ? _self.imageUrl
+          : imageUrl // ignore: cast_nullable_to_non_nullable
+              as String?,
       condition: freezed == condition
           ? _self.condition
           : condition // ignore: cast_nullable_to_non_nullable
@@ -308,6 +335,10 @@ class _$AuctionCopyWithImpl<$Res> implements $AuctionCopyWith<$Res> {
       cardSet: freezed == cardSet
           ? _self.cardSet
           : cardSet // ignore: cast_nullable_to_non_nullable
+              as String?,
+      setName: freezed == setName
+          ? _self.setName
+          : setName // ignore: cast_nullable_to_non_nullable
               as String?,
       language: freezed == language
           ? _self.language
@@ -329,6 +360,10 @@ class _$AuctionCopyWithImpl<$Res> implements $AuctionCopyWith<$Res> {
           ? _self.totalBids
           : totalBids // ignore: cast_nullable_to_non_nullable
               as int?,
+      bidCount: freezed == bidCount
+          ? _self.bidCount
+          : bidCount // ignore: cast_nullable_to_non_nullable
+              as int?,
       views: freezed == views
           ? _self.views
           : views // ignore: cast_nullable_to_non_nullable
@@ -337,6 +372,10 @@ class _$AuctionCopyWithImpl<$Res> implements $AuctionCopyWith<$Res> {
           ? _self.isWatched
           : isWatched // ignore: cast_nullable_to_non_nullable
               as bool?,
+      sellerJoinDate: freezed == sellerJoinDate
+          ? _self.sellerJoinDate
+          : sellerJoinDate // ignore: cast_nullable_to_non_nullable
+              as DateTime?,
       createdAt: freezed == createdAt
           ? _self.createdAt
           : createdAt // ignore: cast_nullable_to_non_nullable
@@ -370,16 +409,20 @@ class _Auction implements Auction {
       required this.type,
       required this.tcg,
       final List<String>? images,
+      this.imageUrl,
       this.condition,
       this.rarity,
       this.cardSet,
+      this.setName,
       this.language,
       final List<Bid>? bids,
       this.winnerId,
       this.winnerName,
       this.totalBids,
+      this.bidCount,
       this.views,
       this.isWatched,
+      this.sellerJoinDate,
       this.createdAt,
       this.updatedAt})
       : _images = images,
@@ -430,11 +473,15 @@ class _Auction implements Auction {
   }
 
   @override
+  final String? imageUrl;
+  @override
   final String? condition;
   @override
   final String? rarity;
   @override
   final String? cardSet;
+  @override
+  final String? setName;
   @override
   final String? language;
   final List<Bid>? _bids;
@@ -454,9 +501,13 @@ class _Auction implements Auction {
   @override
   final int? totalBids;
   @override
+  final int? bidCount;
+  @override
   final int? views;
   @override
   final bool? isWatched;
+  @override
+  final DateTime? sellerJoinDate;
   @override
   final DateTime? createdAt;
   @override
@@ -508,10 +559,13 @@ class _Auction implements Auction {
             (identical(other.type, type) || other.type == type) &&
             (identical(other.tcg, tcg) || other.tcg == tcg) &&
             const DeepCollectionEquality().equals(other._images, _images) &&
+            (identical(other.imageUrl, imageUrl) ||
+                other.imageUrl == imageUrl) &&
             (identical(other.condition, condition) ||
                 other.condition == condition) &&
             (identical(other.rarity, rarity) || other.rarity == rarity) &&
             (identical(other.cardSet, cardSet) || other.cardSet == cardSet) &&
+            (identical(other.setName, setName) || other.setName == setName) &&
             (identical(other.language, language) ||
                 other.language == language) &&
             const DeepCollectionEquality().equals(other._bids, _bids) &&
@@ -521,9 +575,13 @@ class _Auction implements Auction {
                 other.winnerName == winnerName) &&
             (identical(other.totalBids, totalBids) ||
                 other.totalBids == totalBids) &&
+            (identical(other.bidCount, bidCount) ||
+                other.bidCount == bidCount) &&
             (identical(other.views, views) || other.views == views) &&
             (identical(other.isWatched, isWatched) ||
                 other.isWatched == isWatched) &&
+            (identical(other.sellerJoinDate, sellerJoinDate) ||
+                other.sellerJoinDate == sellerJoinDate) &&
             (identical(other.createdAt, createdAt) ||
                 other.createdAt == createdAt) &&
             (identical(other.updatedAt, updatedAt) ||
@@ -551,23 +609,27 @@ class _Auction implements Auction {
         type,
         tcg,
         const DeepCollectionEquality().hash(_images),
+        imageUrl,
         condition,
         rarity,
         cardSet,
+        setName,
         language,
         const DeepCollectionEquality().hash(_bids),
         winnerId,
         winnerName,
         totalBids,
+        bidCount,
         views,
         isWatched,
+        sellerJoinDate,
         createdAt,
         updatedAt
       ]);
 
   @override
   String toString() {
-    return 'Auction(id: $id, title: $title, description: $description, card: $card, sellerId: $sellerId, sellerName: $sellerName, sellerAvatar: $sellerAvatar, startingPrice: $startingPrice, currentPrice: $currentPrice, reservePrice: $reservePrice, buyNowPrice: $buyNowPrice, startTime: $startTime, endTime: $endTime, status: $status, type: $type, tcg: $tcg, images: $images, condition: $condition, rarity: $rarity, cardSet: $cardSet, language: $language, bids: $bids, winnerId: $winnerId, winnerName: $winnerName, totalBids: $totalBids, views: $views, isWatched: $isWatched, createdAt: $createdAt, updatedAt: $updatedAt)';
+    return 'Auction(id: $id, title: $title, description: $description, card: $card, sellerId: $sellerId, sellerName: $sellerName, sellerAvatar: $sellerAvatar, startingPrice: $startingPrice, currentPrice: $currentPrice, reservePrice: $reservePrice, buyNowPrice: $buyNowPrice, startTime: $startTime, endTime: $endTime, status: $status, type: $type, tcg: $tcg, images: $images, imageUrl: $imageUrl, condition: $condition, rarity: $rarity, cardSet: $cardSet, setName: $setName, language: $language, bids: $bids, winnerId: $winnerId, winnerName: $winnerName, totalBids: $totalBids, bidCount: $bidCount, views: $views, isWatched: $isWatched, sellerJoinDate: $sellerJoinDate, createdAt: $createdAt, updatedAt: $updatedAt)';
   }
 }
 
@@ -595,16 +657,20 @@ abstract mixin class _$AuctionCopyWith<$Res> implements $AuctionCopyWith<$Res> {
       AuctionType type,
       String tcg,
       List<String>? images,
+      String? imageUrl,
       String? condition,
       String? rarity,
       String? cardSet,
+      String? setName,
       String? language,
       List<Bid>? bids,
       String? winnerId,
       String? winnerName,
       int? totalBids,
+      int? bidCount,
       int? views,
       bool? isWatched,
+      DateTime? sellerJoinDate,
       DateTime? createdAt,
       DateTime? updatedAt});
 }
@@ -638,16 +704,20 @@ class __$AuctionCopyWithImpl<$Res> implements _$AuctionCopyWith<$Res> {
     Object? type = null,
     Object? tcg = null,
     Object? images = freezed,
+    Object? imageUrl = freezed,
     Object? condition = freezed,
     Object? rarity = freezed,
     Object? cardSet = freezed,
+    Object? setName = freezed,
     Object? language = freezed,
     Object? bids = freezed,
     Object? winnerId = freezed,
     Object? winnerName = freezed,
     Object? totalBids = freezed,
+    Object? bidCount = freezed,
     Object? views = freezed,
     Object? isWatched = freezed,
+    Object? sellerJoinDate = freezed,
     Object? createdAt = freezed,
     Object? updatedAt = freezed,
   }) {
@@ -720,6 +790,10 @@ class __$AuctionCopyWithImpl<$Res> implements _$AuctionCopyWith<$Res> {
           ? _self._images
           : images // ignore: cast_nullable_to_non_nullable
               as List<String>?,
+      imageUrl: freezed == imageUrl
+          ? _self.imageUrl
+          : imageUrl // ignore: cast_nullable_to_non_nullable
+              as String?,
       condition: freezed == condition
           ? _self.condition
           : condition // ignore: cast_nullable_to_non_nullable
@@ -731,6 +805,10 @@ class __$AuctionCopyWithImpl<$Res> implements _$AuctionCopyWith<$Res> {
       cardSet: freezed == cardSet
           ? _self.cardSet
           : cardSet // ignore: cast_nullable_to_non_nullable
+              as String?,
+      setName: freezed == setName
+          ? _self.setName
+          : setName // ignore: cast_nullable_to_non_nullable
               as String?,
       language: freezed == language
           ? _self.language
@@ -752,6 +830,10 @@ class __$AuctionCopyWithImpl<$Res> implements _$AuctionCopyWith<$Res> {
           ? _self.totalBids
           : totalBids // ignore: cast_nullable_to_non_nullable
               as int?,
+      bidCount: freezed == bidCount
+          ? _self.bidCount
+          : bidCount // ignore: cast_nullable_to_non_nullable
+              as int?,
       views: freezed == views
           ? _self.views
           : views // ignore: cast_nullable_to_non_nullable
@@ -760,6 +842,10 @@ class __$AuctionCopyWithImpl<$Res> implements _$AuctionCopyWith<$Res> {
           ? _self.isWatched
           : isWatched // ignore: cast_nullable_to_non_nullable
               as bool?,
+      sellerJoinDate: freezed == sellerJoinDate
+          ? _self.sellerJoinDate
+          : sellerJoinDate // ignore: cast_nullable_to_non_nullable
+              as DateTime?,
       createdAt: freezed == createdAt
           ? _self.createdAt
           : createdAt // ignore: cast_nullable_to_non_nullable

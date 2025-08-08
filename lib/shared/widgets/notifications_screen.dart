@@ -15,177 +15,192 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return SingleChildScrollView(
-      child: Column(
-        children: [
-          // Hero Section
-          Container(
-            margin: EdgeInsets.all(16),
-            padding: EdgeInsets.all(24),
-            decoration: BoxDecoration(
-              gradient: LinearGradient(
-                colors: [
-                  Color(0xFF4CAF50),
-                  Color(0xFF388E3C),
-                  Color(0xFF2E7D32),
-                ],
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-              ),
-              borderRadius: BorderRadius.circular(16),
-            ),
-            child: Column(
-              children: [
-                Icon(
-                  Icons.notifications_active,
-                  size: 48,
-                  color: Colors.white,
-                ),
-                SizedBox(height: 16),
-                Text(
-                  'Mantente Informado',
-                  style: AppTypography.h4.copyWith(
-                    color: Colors.white,
-                    fontWeight: FontWeight.bold,
-                  ),
-                  textAlign: TextAlign.center,
-                ),
-                SizedBox(height: 8),
-                Text(
-                  'Recibe notificaciones sobre precios, subastas, mensajes y más',
-                  style: AppTypography.bodyMedium.copyWith(
-                    color: Colors.white.withOpacity(0.9),
-                  ),
-                  textAlign: TextAlign.center,
-                ),
-              ],
-            ),
-          ),
-
-          // Push Notifications Toggle
-          Container(
-            margin: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-            padding: EdgeInsets.all(16),
-            decoration: BoxDecoration(
-              color: AppColors.background,
-              borderRadius: BorderRadius.circular(12),
-              border: Border.all(color: AppColors.grey200),
-            ),
-            child: Row(
-              children: [
-                Icon(
-                  Icons.notifications,
-                  color: AppColors.primary,
-                  size: 24,
-                ),
-                SizedBox(width: 12),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        'Notificaciones Push',
-                        style: AppTypography.bodyLarge.copyWith(fontWeight: FontWeight.bold),
-                      ),
-                      Text(
-                        'Recibe notificaciones en tiempo real',
-                        style: AppTypography.bodySmall.copyWith(color: AppColors.textSecondary),
-                      ),
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('Notificaciones'),
+        backgroundColor: AppColors.background,
+        foregroundColor: AppColors.textPrimary,
+        elevation: 0,
+        leading: IconButton(
+          icon: Icon(Icons.arrow_back),
+          onPressed: () => Navigator.of(context).pop(),
+        ),
+      ),
+      body: SafeArea(
+        child: SingleChildScrollView(
+          padding: EdgeInsets.only(bottom: 20),
+          child: Column(
+            children: [
+              // Hero Section
+              Container(
+                margin: EdgeInsets.all(16),
+                padding: EdgeInsets.all(24),
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    colors: [
+                      Color(0xFF4CAF50),
+                      Color(0xFF388E3C),
+                      Color(0xFF2E7D32),
                     ],
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
                   ),
+                  borderRadius: BorderRadius.circular(16),
                 ),
-                Switch(
-                  value: _pushNotificationsEnabled,
-                  onChanged: (value) {
-                    setState(() {
-                      _pushNotificationsEnabled = value;
-                    });
-                    if (value) {
-                      _showEnableNotificationsDialog();
-                    }
-                  },
-                  activeColor: AppColors.primary,
+                child: Column(
+                  children: [
+                    Icon(
+                      Icons.notifications_active,
+                      size: 48,
+                      color: Colors.white,
+                    ),
+                    SizedBox(height: 16),
+                    Text(
+                      'Mantente Informado',
+                      style: AppTypography.h4.copyWith(
+                        color: Colors.white,
+                        fontWeight: FontWeight.bold,
+                      ),
+                      textAlign: TextAlign.center,
+                    ),
+                    SizedBox(height: 8),
+                    Text(
+                      'Recibe notificaciones sobre precios, subastas, mensajes y más',
+                      style: AppTypography.bodyMedium.copyWith(
+                        color: Colors.white.withOpacity(0.9),
+                      ),
+                      textAlign: TextAlign.center,
+                    ),
+                  ],
                 ),
-              ],
-            ),
-          ),
+              ),
 
-          // Notification Types
-          Padding(
-            padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-            child: Text(
-              'Tipos de Notificaciones',
-              style: AppTypography.h5.copyWith(fontWeight: FontWeight.bold),
-            ),
-          ),
+              // Push Notifications Toggle
+              Container(
+                margin: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                padding: EdgeInsets.all(16),
+                decoration: BoxDecoration(
+                  color: AppColors.background,
+                  borderRadius: BorderRadius.circular(12),
+                  border: Border.all(color: AppColors.grey200),
+                ),
+                child: Row(
+                  children: [
+                    Icon(
+                      Icons.notifications,
+                      color: AppColors.primary,
+                      size: 24,
+                    ),
+                    SizedBox(width: 12),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            'Notificaciones Push',
+                            style: AppTypography.bodyLarge.copyWith(fontWeight: FontWeight.bold),
+                          ),
+                          Text(
+                            'Recibe notificaciones en tiempo real',
+                            style: AppTypography.bodySmall.copyWith(color: AppColors.textSecondary),
+                          ),
+                        ],
+                      ),
+                    ),
+                    Switch(
+                      value: _pushNotificationsEnabled,
+                      onChanged: (value) {
+                        setState(() {
+                          _pushNotificationsEnabled = value;
+                        });
+                        if (value) {
+                          _showEnableNotificationsDialog();
+                        }
+                      },
+                      activeColor: AppColors.primary,
+                    ),
+                  ],
+                ),
+              ),
 
-          _buildNotificationType(
-            'Alertas de Precio',
-            'Notificaciones cuando los precios de tus cartas favoritas cambien',
-            Icons.trending_up,
-            _priceAlertsEnabled,
-            (value) => setState(() => _priceAlertsEnabled = value),
-          ),
+              // Notification Types
+              Padding(
+                padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                child: Text(
+                  'Tipos de Notificaciones',
+                  style: AppTypography.h5.copyWith(fontWeight: FontWeight.bold),
+                ),
+              ),
 
-          _buildNotificationType(
-            'Subastas',
-            'Notificaciones sobre nuevas subastas y actualizaciones',
-            Icons.gavel,
-            _auctionAlertsEnabled,
-            (value) => setState(() => _auctionAlertsEnabled = value),
-          ),
+              _buildNotificationType(
+                'Alertas de Precio',
+                'Notificaciones cuando los precios de tus cartas favoritas cambien',
+                Icons.trending_up,
+                _priceAlertsEnabled,
+                (value) => setState(() => _priceAlertsEnabled = value),
+              ),
 
-          _buildNotificationType(
-            'Mensajes',
-            'Notificaciones de mensajes de otros usuarios',
-            Icons.message,
-            _messageAlertsEnabled,
-            (value) => setState(() => _messageAlertsEnabled = value),
-          ),
+              _buildNotificationType(
+                'Subastas',
+                'Notificaciones sobre nuevas subastas y actualizaciones',
+                Icons.gavel,
+                _auctionAlertsEnabled,
+                (value) => setState(() => _auctionAlertsEnabled = value),
+              ),
 
-          // Recent Notifications
-          Padding(
-            padding: EdgeInsets.all(16),
-            child: Text(
-              'Notificaciones Recientes',
-              style: AppTypography.h5.copyWith(fontWeight: FontWeight.bold),
-            ),
-          ),
+              _buildNotificationType(
+                'Mensajes',
+                'Notificaciones de mensajes de otros usuarios',
+                Icons.message,
+                _messageAlertsEnabled,
+                (value) => setState(() => _messageAlertsEnabled = value),
+              ),
 
-          _buildNotificationItem(
-            'Precio actualizado',
-            'El precio de "Charizard" ha cambiado de \$299.99 a \$325.00',
-            'Hace 2 horas',
-            Icons.trending_up,
-            AppColors.buyGreen,
-          ),
+              // Recent Notifications
+              Padding(
+                padding: EdgeInsets.all(16),
+                child: Text(
+                  'Notificaciones Recientes',
+                  style: AppTypography.h5.copyWith(fontWeight: FontWeight.bold),
+                ),
+              ),
 
-          _buildNotificationItem(
-            'Nueva subasta',
-            'Se ha iniciado una nueva subasta de Pokémon',
-            'Hace 4 horas',
-            Icons.gavel,
-            AppColors.primary,
-          ),
+              _buildNotificationItem(
+                'Precio actualizado',
+                'El precio de "Charizard" ha cambiado de \$299.99 a \$325.00',
+                'Hace 2 horas',
+                Icons.trending_up,
+                AppColors.buyGreen,
+              ),
 
-          _buildNotificationItem(
-            'Mensaje nuevo',
-            'Usuario123 te ha enviado un mensaje sobre "Blue-Eyes White Dragon"',
-            'Hace 6 horas',
-            Icons.message,
-            AppColors.grey600,
-          ),
+              _buildNotificationItem(
+                'Nueva subasta',
+                'Se ha iniciado una nueva subasta de Pokémon',
+                'Hace 4 horas',
+                Icons.gavel,
+                AppColors.primary,
+              ),
 
-          _buildNotificationItem(
-            'Oferta recibida',
-            'Has recibido una oferta de \$45.00 por "Dark Magician"',
-            'Hace 1 día',
-            Icons.local_offer,
-            AppColors.buyGreen,
-          ),
+              _buildNotificationItem(
+                'Mensaje nuevo',
+                'Usuario123 te ha enviado un mensaje sobre "Blue-Eyes White Dragon"',
+                'Hace 6 horas',
+                Icons.message,
+                AppColors.grey600,
+              ),
 
-          SizedBox(height: 24),
-        ],
+              _buildNotificationItem(
+                'Oferta recibida',
+                'Has recibido una oferta de \$45.00 por "Dark Magician"',
+                'Hace 1 día',
+                Icons.local_offer,
+                AppColors.buyGreen,
+              ),
+
+              SizedBox(height: 24),
+            ],
+          ),
+        ),
       ),
     );
   }

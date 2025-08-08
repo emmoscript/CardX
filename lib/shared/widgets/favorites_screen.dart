@@ -1,12 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../core/constants/app_colors.dart';
-import '../../core/constants/app_typography.dart';
 import '../../core/constants/app_spacing.dart';
-import '../../shared/models/card.dart';
+import '../../core/constants/app_typography.dart';
+import '../../shared/models/card.dart' as card_model;
 import '../../shared/widgets/card_tile.dart';
 import '../../features/tcg/tcg_card_detail_screen.dart';
 import 'package:hive/hive.dart';
+import '../../core/services/hive_database_service.dart';
 
 class FavoritesScreen extends ConsumerStatefulWidget {
   @override
@@ -14,7 +15,7 @@ class FavoritesScreen extends ConsumerStatefulWidget {
 }
 
 class _FavoritesScreenState extends ConsumerState<FavoritesScreen> {
-  List<Card> _favoriteCards = [];
+  List<card_model.Card> _favoriteCards = [];
   List<String> _favoriteLists = ['Mi Colección', 'Deseos', 'Para Vender'];
   String _selectedList = 'Mi Colección';
   bool _isLoading = false;
@@ -26,66 +27,42 @@ class _FavoritesScreenState extends ConsumerState<FavoritesScreen> {
   }
 
   Future<void> _loadFavoriteCards() async {
-    setState(() {
-      _isLoading = true;
-    });
-
-    // Simular carga de favoritos
-    await Future.delayed(const Duration(seconds: 1));
-    
-    // Mock data - en una implementación real esto vendría de la base de datos
-    final now = DateTime.now();
-    _favoriteCards = [
-      Card(
-        id: 'pokemon-1',
-        name: 'Charizard',
-        game: CardGame.pokemon,
-        imageUrl: 'https://images.pokemontcg.io/base1/4.png',
-        setName: 'Base Set',
-        rarity: CardRarity.rareHolo,
-        price: 299.99,
-        isForSale: true,
-        isForTrade: false,
-        createdAt: now,
-        updatedAt: now,
-      ),
-      Card(
-        id: 'yugioh-1',
-        name: 'Blue-Eyes White Dragon',
-        game: CardGame.yugioh,
-        imageUrl: 'https://images.ygoprodeck.com/images/cards/89631139.jpg',
-        setName: 'Legend of Blue Eyes White Dragon',
-        rarity: CardRarity.ultraRare,
-        price: 25.99,
-        type: 'Dragon / Normal',
-        attribute: 'Light',
-        level: 8,
-        atk: 3000,
-        def: 2500,
-        archetype: 'Blue-Eyes',
-        isForSale: true,
-        isForTrade: false,
-        createdAt: now,
-        updatedAt: now,
-      ),
-      Card(
-        id: 'magic-1',
-        name: 'Black Lotus',
-        game: CardGame.mtg,
-        imageUrl: 'https://via.placeholder.com/250x350/000000/FFFFFF?text=Black+Lotus',
-        setName: 'Alpha',
-        rarity: CardRarity.rare,
-        price: 50000.00,
-        isForSale: true,
-        isForTrade: false,
-        createdAt: now,
-        updatedAt: now,
-      ),
-    ];
-
-    setState(() {
-      _isLoading = false;
-    });
+    try {
+      // Get current user ID from Hive
+      var box = Hive.box('userBox');
+      String userId = box.get('userId', defaultValue: '');
+      
+      if (userId.isEmpty) {
+        if (mounted) {
+          setState(() {
+            _favoriteCards = [];
+            _isLoading = false;
+          });
+        }
+        return;
+      }
+      
+      final database = HiveDatabaseService.instance;
+      final favoriteCardIds = await database.getUserCollection(userId);
+      
+      // For now, we'll use mock cards. In a real app, you'd fetch the actual cards
+      final allCards = await database.getAllCards();
+      final favoriteCards = allCards.where((card) => favoriteCardIds.contains(card.id)).toList();
+      
+      if (mounted) {
+        setState(() {
+          _favoriteCards = favoriteCards;
+          _isLoading = false;
+        });
+      }
+    } catch (e) {
+      print('Error loading favorite cards: $e');
+      if (mounted) {
+        setState(() {
+          _isLoading = false;
+        });
+      }
+    }
   }
 
   @override
@@ -109,87 +86,89 @@ class _FavoritesScreenState extends ConsumerState<FavoritesScreen> {
           ),
         ],
       ),
-      body: Column(
-        children: [
-          // Hero Section
-          Container(
-            width: double.infinity,
-            padding: const EdgeInsets.all(AppSpacing.lg),
-            decoration: BoxDecoration(
-              gradient: LinearGradient(
-                colors: [
-                  AppColors.primary.withOpacity(0.1),
-                  AppColors.primary.withOpacity(0.05),
+      body: SafeArea(
+        child: Column(
+          children: [
+            // Hero Section
+            Container(
+              width: double.infinity,
+              padding: const EdgeInsets.all(AppSpacing.lg),
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  colors: [
+                    AppColors.primary.withOpacity(0.1),
+                    AppColors.primary.withOpacity(0.05),
+                  ],
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                ),
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'Construye tu colección',
+                    style: AppTypography.h5.copyWith(
+                      fontWeight: FontWeight.bold,
+                      color: AppColors.textPrimary,
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  Text(
+                    'Organiza tus cartas favoritas en listas personalizadas',
+                    style: AppTypography.body1.copyWith(
+                      color: AppColors.textSecondary,
+                    ),
+                  ),
                 ],
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
               ),
             ),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  'Construye tu colección',
-                  style: AppTypography.h5.copyWith(
-                    fontWeight: FontWeight.bold,
-                    color: AppColors.textPrimary,
+            
+            // List Selector
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md, vertical: AppSpacing.sm),
+              child: Row(
+                children: [
+                  Text(
+                    'Lista:',
+                    style: AppTypography.body1.copyWith(
+                      fontWeight: FontWeight.w600,
+                      color: AppColors.textPrimary,
+                    ),
                   ),
-                ),
-                const SizedBox(height: 8),
-                Text(
-                  'Organiza tus cartas favoritas en listas personalizadas',
-                  style: AppTypography.body1.copyWith(
-                    color: AppColors.textSecondary,
+                  const SizedBox(width: AppSpacing.sm),
+                  Expanded(
+                    child: DropdownButton<String>(
+                      value: _selectedList,
+                      isExpanded: true,
+                      underline: Container(),
+                      items: _favoriteLists.map((String list) {
+                        return DropdownMenuItem<String>(
+                          value: list,
+                          child: Text(list),
+                        );
+                      }).toList(),
+                      onChanged: (String? newValue) {
+                        setState(() {
+                          _selectedList = newValue!;
+                        });
+                      },
+                    ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
-          ),
-          
-          // List Selector
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md, vertical: AppSpacing.sm),
-            child: Row(
-              children: [
-                Text(
-                  'Lista:',
-                  style: AppTypography.body1.copyWith(
-                    fontWeight: FontWeight.w600,
-                    color: AppColors.textPrimary,
-                  ),
-                ),
-                const SizedBox(width: AppSpacing.sm),
-                Expanded(
-                  child: DropdownButton<String>(
-                    value: _selectedList,
-                    isExpanded: true,
-                    underline: Container(),
-                    items: _favoriteLists.map((String list) {
-                      return DropdownMenuItem<String>(
-                        value: list,
-                        child: Text(list),
-                      );
-                    }).toList(),
-                    onChanged: (String? newValue) {
-                      setState(() {
-                        _selectedList = newValue!;
-                      });
-                    },
-                  ),
-                ),
-              ],
+            
+            // Content
+            Expanded(
+              child: _isLoading
+                  ? const Center(child: CircularProgressIndicator())
+                  : _favoriteCards.isEmpty
+                      ? _buildEmptyState()
+                      : _buildFavoritesList(),
             ),
-          ),
-          
-          // Content
-          Expanded(
-            child: _isLoading
-                ? const Center(child: CircularProgressIndicator())
-                : _favoriteCards.isEmpty
-                    ? _buildEmptyState()
-                    : _buildFavoritesList(),
-          ),
-        ],
+          ],
+        ),
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: _showAddCardDialog,
@@ -248,27 +227,30 @@ class _FavoritesScreenState extends ConsumerState<FavoritesScreen> {
   }
 
   Widget _buildFavoritesList() {
-    return ListView.builder(
-      padding: const EdgeInsets.all(AppSpacing.md),
+    return GridView.builder(
+      padding: const EdgeInsets.fromLTRB(AppSpacing.md, AppSpacing.md, AppSpacing.md, AppSpacing.lg + 72),
+      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+        crossAxisCount: 2, // Two columns
+        childAspectRatio: 0.6, // Increased height (was 0.7)
+        crossAxisSpacing: AppSpacing.md,
+        mainAxisSpacing: AppSpacing.md,
+      ),
       itemCount: _favoriteCards.length,
       itemBuilder: (context, index) {
         final card = _favoriteCards[index];
-        return Container(
-          margin: const EdgeInsets.only(bottom: AppSpacing.sm),
-          child: CardTile(
-            card: card,
-            onTap: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => TcgCardDetailScreen(
-                    card: card,
-                    bottomNavBar: _buildBottomNavigationBar(),
-                  ),
+        return CardTile(
+          card: card,
+          onTap: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => TcgCardDetailScreen(
+                  card: card,
+                  bottomNavBar: _buildBottomNavigationBar(),
                 ),
-              );
-            },
-          ),
+              ),
+            );
+          },
         );
       },
     );
@@ -373,11 +355,7 @@ class _FavoritesScreenState extends ConsumerState<FavoritesScreen> {
   }
 
   void _showAddCardDialog() {
-    // TODO: Implementar búsqueda y agregado de cartas
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Text('Función de agregar cartas próximamente'),
-      ),
-    );
+    // Navigate to search screen to add cards to favorites
+    Navigator.of(context).pushNamed('/search');
   }
-} 
+}

@@ -1,7 +1,7 @@
 import 'package:uuid/uuid.dart';
 import '../../shared/models/user.dart';
 import '../../shared/models/card.dart';
-import 'database_helper.dart';
+import 'hive_database_service.dart';
 import 'card_repository.dart';
 
 class SeedDataService {
@@ -59,11 +59,18 @@ class SeedDataService {
       ),
     ];
     
-    final db = await DatabaseHelper.instance.database;
+    int createdCount = 0;
+    
     for (final user in users) {
-      await db.insert('users', user.toMap());
+      try {
+        await HiveDatabaseService.instance.insertUser(user);
+        createdCount++;
+      } catch (e) {
+        // User already exists, skip
+        print('⚠️ User ${user.email} already exists, skipping...');
+      }
     }
-    print('👥 Created ${users.length} sample users');
+    print('👥 Created $createdCount new sample users');
   }
   
   static Future<void> _seedCards() async {
@@ -90,46 +97,31 @@ class SeedDataService {
         setName: 'Base Set',
         game: CardGame.pokemon,
         rarity: CardRarity.common,
-        condition: CardCondition.mint,
-        price: 25.0,
-        imageUrl: 'https://images.unsplash.com/photo-1611224923853-80b023f02d71?w=300',
-        sellerId: 'user_001',
-        isForTrade: true,
-        description: 'Mint condition Pikachu from Base Set',
-        createdAt: DateTime.now().subtract(Duration(days: 25)),
-        updatedAt: DateTime.now(),
-      ),
-      Card(
-        id: _uuid.v4(),
-        name: 'Blastoise',
-        setName: 'Base Set',
-        game: CardGame.pokemon,
-        rarity: CardRarity.rareHolo,
-        condition: CardCondition.excellent,
-        price: 180.0,
+        condition: CardCondition.nearMint,
+        price: 15.0,
         imageUrl: 'https://images.unsplash.com/photo-1611224923853-80b023f02d71?w=300',
         sellerId: 'user_002',
         isForSale: true,
-        description: 'Excellent condition Blastoise holo',
-        createdAt: DateTime.now().subtract(Duration(days: 20)),
-        updatedAt: DateTime.now(),
-      ),
-      Card(
-        id: _uuid.v4(),
-        name: 'Venusaur',
-        setName: 'Base Set',
-        game: CardGame.pokemon,
-        rarity: CardRarity.rareHolo,
-        condition: CardCondition.good,
-        price: 120.0,
-        imageUrl: 'https://images.unsplash.com/photo-1611224923853-80b023f02d71?w=300',
-        sellerId: 'user_002',
-        isForSale: true,
-        description: 'Good condition Venusaur, some edge wear',
+        description: 'Classic Pikachu from Base Set',
         createdAt: DateTime.now().subtract(Duration(days: 15)),
         updatedAt: DateTime.now(),
       ),
-      
+      // Yu-Gi-Oh! Cards
+      Card(
+        id: _uuid.v4(),
+        name: 'Blue-Eyes White Dragon',
+        setName: 'Legend of Blue Eyes White Dragon',
+        game: CardGame.yugioh,
+        rarity: CardRarity.ultraRare,
+        condition: CardCondition.mint,
+        price: 200.0,
+        imageUrl: 'https://images.unsplash.com/photo-1611224923853-80b023f02d71?w=300',
+        sellerId: 'user_001',
+        isForSale: true,
+        description: 'First edition Blue-Eyes White Dragon',
+        createdAt: DateTime.now().subtract(Duration(days: 45)),
+        updatedAt: DateTime.now(),
+      ),
       // Magic: The Gathering Cards
       Card(
         id: _uuid.v4(),
@@ -137,130 +129,57 @@ class SeedDataService {
         setName: 'Alpha',
         game: CardGame.mtg,
         rarity: CardRarity.rare,
-        condition: CardCondition.good,
-        price: 15000.0,
-        imageUrl: 'https://images.unsplash.com/photo-1611224923853-80b023f02d71?w=300',
-        sellerId: 'user_003',
-        isForSale: true,
-        description: 'Alpha Black Lotus in good condition',
-        createdAt: DateTime.now().subtract(Duration(days: 10)),
-        updatedAt: DateTime.now(),
-      ),
-      Card(
-        id: _uuid.v4(),
-        name: 'Lightning Bolt',
-        setName: 'Alpha',
-        game: CardGame.mtg,
-        rarity: CardRarity.common,
-        condition: CardCondition.nearMint,
-        price: 45.0,
-        imageUrl: 'https://images.unsplash.com/photo-1611224923853-80b023f02d71?w=300',
-        sellerId: 'user_003',
-        isForTrade: true,
-        description: 'Alpha Lightning Bolt in near mint condition',
-        createdAt: DateTime.now().subtract(Duration(days: 8)),
-        updatedAt: DateTime.now(),
-      ),
-      Card(
-        id: _uuid.v4(),
-        name: 'Counterspell',
-        setName: 'Alpha',
-        game: CardGame.mtg,
-        rarity: CardRarity.uncommon,
         condition: CardCondition.excellent,
-        price: 85.0,
+        price: 50000.0,
         imageUrl: 'https://images.unsplash.com/photo-1611224923853-80b023f02d71?w=300',
-        sellerId: 'user_001',
-        isForSale: true,
-        description: 'Alpha Counterspell in excellent condition',
-        createdAt: DateTime.now().subtract(Duration(days: 5)),
+        sellerId: 'user_003',
+        isForSale: false,
+        isForTrade: true,
+        description: 'Alpha Black Lotus - The most valuable Magic card',
+        createdAt: DateTime.now().subtract(Duration(days: 60)),
         updatedAt: DateTime.now(),
       ),
-      
-      // Yu-Gi-Oh! Cards
+      // One Piece Cards
       Card(
         id: _uuid.v4(),
-        name: 'Blue-Eyes White Dragon',
-        setName: 'LOB',
-        game: CardGame.yugioh,
-        rarity: CardRarity.ultraRare,
+        name: 'Monkey D. Luffy',
+        setName: 'OP-01',
+        game: CardGame.onePiece,
+        rarity: CardRarity.secretRare,
         condition: CardCondition.nearMint,
-        price: 450.0,
-        imageUrl: 'https://images.unsplash.com/photo-1611224923853-80b023f02d71?w=300',
-        sellerId: 'user_001',
-        isForSale: true,
-        description: 'LOB Blue-Eyes White Dragon in near mint condition',
-        createdAt: DateTime.now().subtract(Duration(days: 3)),
-        updatedAt: DateTime.now(),
-      ),
-      Card(
-        id: _uuid.v4(),
-        name: 'Dark Magician',
-        setName: 'LOB',
-        game: CardGame.yugioh,
-        rarity: CardRarity.ultraRare,
-        condition: CardCondition.mint,
-        price: 380.0,
+        price: 150.0,
         imageUrl: 'https://images.unsplash.com/photo-1611224923853-80b023f02d71?w=300',
         sellerId: 'user_002',
         isForSale: true,
-        description: 'Mint condition Dark Magician from LOB',
-        createdAt: DateTime.now().subtract(Duration(days: 2)),
-        updatedAt: DateTime.now(),
-      ),
-      Card(
-        id: _uuid.v4(),
-        name: 'Red-Eyes Black Dragon',
-        setName: 'LOB',
-        game: CardGame.yugioh,
-        rarity: CardRarity.ultraRare,
-        condition: CardCondition.excellent,
-        price: 320.0,
-        imageUrl: 'https://images.unsplash.com/photo-1611224923853-80b023f02d71?w=300',
-        sellerId: 'user_003',
-        isForTrade: true,
-        description: 'Excellent condition Red-Eyes Black Dragon',
-        createdAt: DateTime.now().subtract(Duration(days: 1)),
+        description: 'Secret Rare Luffy from OP-01',
+        createdAt: DateTime.now().subtract(Duration(days: 20)),
         updatedAt: DateTime.now(),
       ),
     ];
     
+    int createdCount = 0;
+    
     for (final card in cards) {
-      await CardRepository.instance.create(card);
+      try {
+        await HiveDatabaseService.instance.insertCard(card);
+        createdCount++;
+      } catch (e) {
+        // Card already exists, skip
+        print('⚠️ Card ${card.name} already exists, skipping...');
+      }
     }
-    print('🃏 Created ${cards.length} sample cards');
+    print('🃏 Created $createdCount new sample cards');
   }
   
-  // Método para limpiar datos de ejemplo
-  static Future<void> clearSampleData() async {
-    final db = await DatabaseHelper.instance.database;
-    
-    await db.delete('cards');
-    await db.delete('users');
-    
-    print('🗑️ Cleared all sample data');
-  }
-  
-  // Método para verificar si la BD está vacía
   static Future<bool> isDatabaseEmpty() async {
-    final totalCards = await CardRepository.instance.getTotalCards();
-    return totalCards == 0;
-  }
-  
-  // Método para obtener estadísticas de los datos de ejemplo
-  static Future<Map<String, dynamic>> getSampleDataStats() async {
-    final totalCards = await CardRepository.instance.getTotalCards();
-    final cardsForSale = await CardRepository.instance.getCardsForSaleCount();
-    final cardsForTrade = await CardRepository.instance.getCardsForTradeCount();
-    final avgPrice = await CardRepository.instance.getAveragePrice();
-    final gameStats = await CardRepository.instance.getCardsByGameStats();
-    
-    return {
-      'totalCards': totalCards,
-      'cardsForSale': cardsForSale,
-      'cardsForTrade': cardsForTrade,
-      'averagePrice': avgPrice,
-      'gameStats': gameStats,
-    };
+    try {
+      final users = await HiveDatabaseService.instance.getAllUsers();
+      final cards = await HiveDatabaseService.instance.getAllCards();
+      
+      return users.isEmpty && cards.isEmpty;
+    } catch (e) {
+      print('❌ Error checking database: $e');
+      return true; // Assume empty if error
+    }
   }
 } 

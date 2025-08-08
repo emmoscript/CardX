@@ -5,6 +5,7 @@ import '../../core/constants/app_spacing.dart';
 import '../models/card.dart' as card_model;
 import '../../features/tcg/tcg_card_list_screen.dart';
 import '../../features/home/home_screen.dart';
+import '../../features/tcg/tcg_card_detail_screen.dart';
 
 class LatestSinglesSlider extends StatelessWidget {
   final String game;
@@ -148,181 +149,213 @@ class LatestSinglesSlider extends StatelessWidget {
           ),
         ),
         SizedBox(
-          height: 150,
+          height: 150, // Standardized height for all singles
           child: ListView.separated(
             padding: EdgeInsets.symmetric(horizontal: 20),
             scrollDirection: Axis.horizontal,
-            itemCount: cards.length,
-            separatorBuilder: (_, __) => SizedBox(width: 18),
+            itemCount: cards.take(3).length, // Show only 3 cards like Star Wars
+            separatorBuilder: (_, __) => SizedBox(width: 18), // Consistent spacing
             itemBuilder: (context, index) {
               final card = cards[index];
-              return Stack(
-                children: [
-                  Container(
-                    width: 320,
-                    decoration: BoxDecoration(
-                      color: AppColors.background,
-                      borderRadius: BorderRadius.circular(14),
-                      boxShadow: [
-                        BoxShadow(
-                          color: AppColors.shadowLight.withOpacity(0.10),
-                          blurRadius: 8,
-                          offset: Offset(0, 2),
-                        ),
-                      ],
+              return GestureDetector(
+                onTap: () {
+                  // Navigate to card detail page
+                  Navigator.of(context).push(
+                    MaterialPageRoute(
+                      builder: (context) => TcgCardDetailScreen(card: card),
                     ),
-                    child: Row(
-                      children: [
-                        ClipRRect(
-                          borderRadius: BorderRadius.zero,
+                  );
+                },
+                child: Container(
+                  width: 320,
+                  height: 200, // Reduced height to be more compact
+                  decoration: BoxDecoration(
+                    color: AppColors.background,
+                    borderRadius: BorderRadius.circular(14),
+                    boxShadow: [
+                      BoxShadow(
+                        color: AppColors.shadowLight.withOpacity(0.10),
+                        blurRadius: 8,
+                        offset: Offset(0, 2),
+                      ),
+                    ],
+                  ),
+                  child: Row(
+                    children: [
+                      // Image section
+                      Container(
+                        width: 120,
+                        height: 200,
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.only(
+                            topLeft: Radius.circular(14),
+                            bottomLeft: Radius.circular(14),
+                          ),
+                        ),
+                        child: ClipRRect(
+                          borderRadius: BorderRadius.only(
+                            topLeft: Radius.circular(14),
+                            bottomLeft: Radius.circular(14),
+                          ),
                           child: Image.network(
                             card.imageUrl ?? 'https://via.placeholder.com/250x350/CCCCCC/FFFFFF?text=No+Image',
-                            width: 110,
-                            height: 150,
-                            fit: BoxFit.cover,
+                            width: 120,
+                            height: 200,
+                            fit: BoxFit.contain,
+                            alignment: Alignment.centerLeft, // Align to left to show full card
                             loadingBuilder: (context, child, loadingProgress) {
                               if (loadingProgress == null) return child;
                               return Container(
-                                width: 110,
-                                height: 150,
+                                width: 120,
+                                height: 200,
                                 color: AppColors.grey100,
                                 child: Center(
                                   child: CircularProgressIndicator(
-                                    value: loadingProgress.expectedTotalBytes != null
-                                        ? loadingProgress.cumulativeBytesLoaded / loadingProgress.expectedTotalBytes!
-                                        : null,
                                     strokeWidth: 2,
                                     color: AppColors.primary,
                                   ),
                                 ),
                               );
                             },
-                            errorBuilder: (_, __, ___) => Container(
-                              width: 110,
-                              height: 150,
-                              color: AppColors.grey100,
-                              child: Icon(Icons.image, size: 40, color: AppColors.grey400),
-                            ),
+                            errorBuilder: (context, error, stackTrace) {
+                              return Container(
+                                width: 120,
+                                height: 200,
+                                color: AppColors.grey100,
+                                child: Icon(Icons.image, size: 40, color: AppColors.grey400),
+                              );
+                            },
                           ),
                         ),
-                        Expanded(
-                          child: Padding(
-                            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                Row(
-                                  children: [
-                                    Container(
-                                      constraints: BoxConstraints(maxWidth: 70),
-                                      padding: EdgeInsets.symmetric(horizontal: 7, vertical: 2),
-                                      decoration: BoxDecoration(
-                                        color: AppColors.primary.withOpacity(0.12),
-                                        borderRadius: BorderRadius.circular(8),
-                                      ),
-                                      child: Text(
-                                        _getGameDisplayName(card.game),
-                                        style: AppTypography.labelSmall.copyWith(fontWeight: FontWeight.bold, color: AppColors.primary, fontSize: 10),
-                                        maxLines: 1,
-                                        overflow: TextOverflow.ellipsis,
+                      ),
+                      // Content section
+                      Expanded(
+                        child: Padding(
+                          padding: const EdgeInsets.all(12),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              // Top row: Game and Rarity badges side by side
+                              Row(
+                                children: [
+                                  // Game badge
+                                  Container(
+                                    padding: EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                                    decoration: BoxDecoration(
+                                      color: _getGameColor(card.game).withOpacity(0.1),
+                                      borderRadius: BorderRadius.circular(4),
+                                      border: Border.all(
+                                        color: _getGameColor(card.game).withOpacity(0.3),
+                                        width: 0.5,
                                       ),
                                     ),
-                                    SizedBox(width: 6),
-                                    if (card.rarity != null) ...[
-                                      Container(
-                                        constraints: BoxConstraints(maxWidth: 32),
-                                        padding: EdgeInsets.symmetric(horizontal: 5, vertical: 2),
-                                        decoration: BoxDecoration(
-                                          color: AppColors.grey200,
-                                          borderRadius: BorderRadius.circular(8),
-                                        ),
-                                        child: Text(
-                                          _getRarityDisplayName(card.rarity!),
-                                          style: AppTypography.labelSmall.copyWith(fontWeight: FontWeight.bold, color: AppColors.textPrimary, fontSize: 10),
-                                          maxLines: 1,
-                                          overflow: TextOverflow.ellipsis,
+                                    child: Text(
+                                      card.game.shortName,
+                                      style: AppTypography.labelSmall.copyWith(
+                                        color: _getGameColor(card.game),
+                                        fontWeight: FontWeight.w600,
+                                        fontSize: 9,
+                                      ),
+                                    ),
+                                  ),
+                                  SizedBox(width: 6),
+                                  // Rarity badge
+                                  if (card.rarity != null)
+                                    Container(
+                                      padding: EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                                      decoration: BoxDecoration(
+                                        color: _getRarityColor(card.rarity!).withOpacity(0.1),
+                                        borderRadius: BorderRadius.circular(4),
+                                        border: Border.all(
+                                          color: _getRarityColor(card.rarity!).withOpacity(0.3),
+                                          width: 0.5,
                                         ),
                                       ),
-                                    ],
-                                  ],
-                                ),
-                                SizedBox(height: 4),
-                                Text(
+                                      child: Text(
+                                        card.rarity!.displayName,
+                                        style: AppTypography.labelSmall.copyWith(
+                                          color: _getRarityColor(card.rarity!),
+                                          fontWeight: FontWeight.w600,
+                                          fontSize: 9,
+                                        ),
+                                      ),
+                                    ),
+                                  Spacer(),
+                                  // Language badge in top-right
+                                  Container(
+                                    padding: EdgeInsets.symmetric(horizontal: 4, vertical: 2),
+                                    decoration: BoxDecoration(
+                                      color: Colors.black.withOpacity(0.7),
+                                      borderRadius: BorderRadius.circular(4),
+                                    ),
+                                    child: Text(
+                                      _getLanguageBadge(card),
+                                      style: AppTypography.labelSmall.copyWith(
+                                        color: Colors.white,
+                                        fontWeight: FontWeight.bold,
+                                        fontSize: 8,
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              SizedBox(height: 8),
+                              // Card name
+                              Expanded(
+                                child: Text(
                                   card.name,
-                                  style: AppTypography.bodyLarge.copyWith(fontWeight: FontWeight.bold, fontSize: 14),
+                                  style: AppTypography.bodyMedium.copyWith(
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 13,
+                                  ),
+                                  maxLines: 3,
+                                  overflow: TextOverflow.ellipsis,
+                                ),
+                              ),
+                              SizedBox(height: 6),
+                              // Set name (if available)
+                              if (card.setName != null) ...[
+                                Text(
+                                  card.setName!,
+                                  style: AppTypography.bodySmall.copyWith(
+                                    color: AppColors.textSecondary,
+                                    fontSize: 11,
+                                  ),
                                   maxLines: 1,
                                   overflow: TextOverflow.ellipsis,
                                 ),
-                                SizedBox(height: 2),
-                                if (card.setName != null) ...[
-                                  Text(
-                                    card.setName!,
-                                    style: AppTypography.labelMedium.copyWith(color: AppColors.textSecondary, fontSize: 11),
-                                    maxLines: 1,
-                                    overflow: TextOverflow.ellipsis,
-                                  ),
-                                  SizedBox(height: 2),
-                                ],
-                                if (card.id.isNotEmpty) ...[
-                                  Text(
-                                    'ID: ${card.id}',
-                                    style: AppTypography.labelSmall.copyWith(color: AppColors.grey400, fontSize: 10),
-                                    maxLines: 1,
-                                    overflow: TextOverflow.ellipsis,
-                                  ),
-                                  SizedBox(height: 6),
-                                ],
-                                if (card.price != null) ...[
-                                  Row(
-                                    children: [
-                                      Container(
-                                        constraints: BoxConstraints(maxWidth: 54),
-                                        padding: EdgeInsets.symmetric(horizontal: 7, vertical: 3),
-                                        decoration: BoxDecoration(
-                                          color: AppColors.buyGreen.withOpacity(0.12),
-                                          borderRadius: BorderRadius.circular(8),
-                                        ),
-                                        child: Text(
-                                          '\$${card.price!.toStringAsFixed(2)}',
-                                          style: AppTypography.bodyLarge.copyWith(fontWeight: FontWeight.bold, color: AppColors.buyGreen, fontSize: 11),
-                                          maxLines: 1,
-                                          overflow: TextOverflow.ellipsis,
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                ],
+                                SizedBox(height: 4),
                               ],
-                            ),
+                              // Bottom row: ID and Price
+                              Row(
+                                children: [
+                                  Expanded(
+                                    child: Text(
+                                      'ID: ${card.id}',
+                                      style: AppTypography.caption.copyWith(
+                                        color: AppColors.textSecondary,
+                                        fontSize: 9,
+                                      ),
+                                    ),
+                                  ),
+                                  if (card.price != null)
+                                    Text(
+                                      '\$${card.price!.toStringAsFixed(2)}',
+                                      style: AppTypography.bodyMedium.copyWith(
+                                        fontWeight: FontWeight.bold,
+                                        color: AppColors.buyGreen,
+                                        fontSize: 14,
+                                      ),
+                                    ),
+                                ],
+                              ),
+                            ],
                           ),
                         ),
-                      ],
-                    ),
-                  ),
-                  // Badge de idioma en la esquina superior derecha del card
-                  Positioned(
-                    top: 8,
-                    right: 8,
-                    child: Container(
-                      padding: EdgeInsets.symmetric(horizontal: 7, vertical: 2),
-                      decoration: BoxDecoration(
-                        color: AppColors.primary,
-                        borderRadius: BorderRadius.circular(8),
                       ),
-                      child: Text(
-                        'EN',
-                        style: AppTypography.labelSmall.copyWith(
-                          fontWeight: FontWeight.bold,
-                          color: Colors.white,
-                          fontSize: 10,
-                        ),
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                    ),
+                    ],
                   ),
-                ],
+                ),
               );
             },
           ),
@@ -420,5 +453,42 @@ class LatestSinglesSlider extends StatelessWidget {
   String _getTcgImage(String game) {
     final info = getTcgInfo(game);
     return info.image;
+  }
+
+  String _getLanguageBadge(card_model.Card card) {
+    // For now, return EN as default since CardLanguage is not defined
+    return 'EN';
+  }
+
+  Color _getGameColor(card_model.CardGame game) {
+    switch (game) {
+      case card_model.CardGame.pokemon:
+        return AppColors.pokemon;
+      case card_model.CardGame.yugioh:
+        return AppColors.yugioh;
+      case card_model.CardGame.mtg:
+        return AppColors.primary;
+      default:
+        return AppColors.primary;
+    }
+  }
+
+  Color _getRarityColor(card_model.CardRarity rarity) {
+    switch (rarity) {
+      case card_model.CardRarity.common:
+        return AppColors.textSecondary;
+      case card_model.CardRarity.uncommon:
+        return AppColors.textSecondary;
+      case card_model.CardRarity.rare:
+        return AppColors.primary;
+      case card_model.CardRarity.rareHolo:
+        return AppColors.primary;
+      case card_model.CardRarity.ultraRare:
+        return AppColors.warning;
+      case card_model.CardRarity.secretRare:
+        return AppColors.warning;
+      default:
+        return AppColors.textSecondary;
+    }
   }
 } 

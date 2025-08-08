@@ -1,15 +1,18 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../core/constants/app_colors.dart';
-import '../../core/constants/app_typography.dart';
 import '../../core/constants/app_spacing.dart';
+import '../../core/constants/app_typography.dart';
+import '../../shared/models/card.dart' as card_model;
 import '../../shared/models/card.dart';
 import '../../shared/widgets/card_tile.dart';
 import '../../shared/widgets/google_ads_widget.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:hive/hive.dart';
+import '../../shared/widgets/messages_screen.dart';
 
 class TcgCardDetailScreen extends StatefulWidget {
-  final Card card;
+  final card_model.Card card;
   final Widget? bottomNavBar;
 
   const TcgCardDetailScreen({
@@ -60,6 +63,12 @@ class _TcgCardDetailScreenState extends State<TcgCardDetailScreen>
         ),
         actions: [
           IconButton(
+            icon: Icon(Icons.message_outlined, color: AppColors.textPrimary),
+            onPressed: () {
+              _showChatWithSeller();
+            },
+          ),
+          IconButton(
             icon: Icon(Icons.favorite_border, color: AppColors.textPrimary),
             onPressed: () {
               // TODO: Implementar favoritos
@@ -71,10 +80,7 @@ class _TcgCardDetailScreenState extends State<TcgCardDetailScreen>
           IconButton(
             icon: Icon(Icons.share, color: AppColors.textPrimary),
             onPressed: () {
-              // TODO: Implementar compartir
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(content: Text('Compartir carta')),
-              );
+              _shareCard();
             },
           ),
         ],
@@ -271,10 +277,7 @@ class _TcgCardDetailScreenState extends State<TcgCardDetailScreen>
             width: double.infinity,
             child: ElevatedButton(
               onPressed: () {
-                // TODO: Implementar compra/oferta
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text('Función de compra próximamente')),
-                );
+                _showBuyOrOfferDialog();
               },
               style: ElevatedButton.styleFrom(
                 backgroundColor: AppColors.primary,
@@ -327,151 +330,19 @@ class _TcgCardDetailScreenState extends State<TcgCardDetailScreen>
         color: AppColors.surface,
         borderRadius: BorderRadius.circular(12),
       ),
-      child: LineChart(
-        LineChartData(
-          gridData: FlGridData(
-            show: true,
-            drawVerticalLine: true,
-            horizontalInterval: 1,
-            verticalInterval: 1,
-            getDrawingHorizontalLine: (value) {
-              return FlLine(
-                color: AppColors.grey300,
-                strokeWidth: 1,
-              );
-            },
-            getDrawingVerticalLine: (value) {
-              return FlLine(
-                color: AppColors.grey300,
-                strokeWidth: 1,
-              );
-            },
-          ),
-          titlesData: FlTitlesData(
-            show: true,
-            rightTitles: AxisTitles(
-              sideTitles: SideTitles(showTitles: false),
-            ),
-            topTitles: AxisTitles(
-              sideTitles: SideTitles(showTitles: false),
-            ),
-            bottomTitles: AxisTitles(
-              sideTitles: SideTitles(
-                showTitles: true,
-                reservedSize: 30,
-                interval: 1,
-                getTitlesWidget: (double value, TitleMeta meta) {
-                  const style = TextStyle(
-                    color: AppColors.textSecondary,
-                    fontWeight: FontWeight.bold,
-                    fontSize: 12,
-                  );
-                  Widget text;
-                  switch (value.toInt()) {
-                    case 0:
-                      text = const Text('Ene', style: style);
-                      break;
-                    case 1:
-                      text = const Text('Feb', style: style);
-                      break;
-                    case 2:
-                      text = const Text('Mar', style: style);
-                      break;
-                    case 3:
-                      text = const Text('Abr', style: style);
-                      break;
-                    case 4:
-                      text = const Text('May', style: style);
-                      break;
-                    case 5:
-                      text = const Text('Jun', style: style);
-                      break;
-                    default:
-                      text = const Text('', style: style);
-                      break;
-                  }
-                  return SideTitleWidget(
-                    axisSide: meta.axisSide,
-                    child: text,
-                  );
-                },
-              ),
-            ),
-            leftTitles: AxisTitles(
-              sideTitles: SideTitles(
-                showTitles: true,
-                interval: 1,
-                getTitlesWidget: (double value, TitleMeta meta) {
-                  const style = TextStyle(
-                    color: AppColors.textSecondary,
-                    fontWeight: FontWeight.bold,
-                    fontSize: 12,
-                  );
-                  return Text('\$${value.toInt()}', style: style, textAlign: TextAlign.center);
-                },
-                reservedSize: 42,
-              ),
-            ),
-          ),
-          borderData: FlBorderData(
-            show: true,
-            border: Border.all(color: AppColors.grey300),
-          ),
-          minX: 0,
-          maxX: 5,
-          minY: 0,
-          maxY: 6,
-          lineBarsData: [
-            LineChartBarData(
-              spots: const [
-                FlSpot(0, 3),
-                FlSpot(1, 2),
-                FlSpot(2, 5),
-                FlSpot(3, 3.1),
-                FlSpot(4, 4),
-                FlSpot(5, 3),
-              ],
-              isCurved: true,
-              gradient: LinearGradient(
-                colors: [
-                  AppColors.primary,
-                  AppColors.primary.withOpacity(0.5),
-                ],
-              ),
-              barWidth: 3,
-              isStrokeCapRound: true,
-              dotData: FlDotData(
-                show: false,
-              ),
-              belowBarData: BarAreaData(
-                show: true,
-                gradient: LinearGradient(
-                  colors: [
-                    AppColors.primary.withOpacity(0.3),
-                    AppColors.primary.withOpacity(0.1),
-                  ],
-                ),
+      child: Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(Icons.show_chart, size: 48, color: AppColors.textSecondary),
+            const SizedBox(height: 8),
+            Text(
+              'Gráfico de precios próximamente',
+              style: AppTypography.body1.copyWith(
+                color: AppColors.textSecondary,
               ),
             ),
           ],
-          lineTouchData: LineTouchData(
-            enabled: true,
-            touchTooltipData: LineTouchTooltipData(
-              tooltipBgColor: AppColors.surface,
-              tooltipRoundedRadius: 8,
-              getTooltipItems: (List<LineBarSpot> touchedBarSpots) {
-                return touchedBarSpots.map((barSpot) {
-                  return LineTooltipItem(
-                    '\$${barSpot.y.toStringAsFixed(2)}',
-                    const TextStyle(
-                      color: AppColors.textPrimary,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  );
-                }).toList();
-              },
-            ),
-          ),
         ),
       ),
     );
@@ -575,7 +446,7 @@ class _TcgCardDetailScreenState extends State<TcgCardDetailScreen>
           const Divider(color: AppColors.grey300, height: 1),
           _buildDetailRow('Set', widget.card.setName ?? 'N/A'),
           const Divider(color: AppColors.grey300, height: 1),
-          _buildDetailRow('Rareza', _getRarityDisplayName(widget.card.rarity)),
+          _buildDetailRow('Rareza', _getRarityDisplayName(widget.card.rarity ?? CardRarity.common)),
           const Divider(color: AppColors.grey300, height: 1),
           if (widget.card.type != null)
             _buildDetailRow('Tipo', widget.card.type!),
@@ -665,19 +536,39 @@ class _TcgCardDetailScreenState extends State<TcgCardDetailScreen>
 
   Widget _buildRecentlyViewed() {
     return SizedBox(
-      height: 200,
+      height: 120,
       child: ListView.builder(
         scrollDirection: Axis.horizontal,
         itemCount: 3,
         itemBuilder: (context, index) {
           return Container(
-            width: 120,
+            width: 80,
             margin: const EdgeInsets.only(right: AppSpacing.sm),
-            child: CardTile(
-              card: widget.card, // Usar la misma carta como ejemplo
-              onTap: () {
-                // TODO: Navegar a otra carta
-              },
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(8),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withOpacity(0.1),
+                  blurRadius: 4,
+                  offset: Offset(0, 2),
+                ),
+              ],
+            ),
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(8),
+              child: widget.card.imageUrl != null && widget.card.imageUrl!.isNotEmpty
+                ? Image.network(
+                    widget.card.imageUrl!,
+                    fit: BoxFit.cover,
+                    errorBuilder: (_, __, ___) => Container(
+                      color: AppColors.surface,
+                      child: Icon(Icons.image, size: 30, color: AppColors.textSecondary),
+                    ),
+                  )
+                : Container(
+                    color: AppColors.surface,
+                    child: Icon(Icons.image, size: 30, color: AppColors.textSecondary),
+                  ),
             ),
           );
         },
@@ -787,5 +678,156 @@ class _TcgCardDetailScreenState extends State<TcgCardDetailScreen>
       default:
         return 'Desconocida';
     }
+  }
+
+  void _showChatWithSeller() {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text('Contactar Vendedor'),
+        content: Text('¿Quieres iniciar una conversación con el vendedor de ${widget.card.name}?'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: Text('Cancelar'),
+          ),
+          ElevatedButton(
+            onPressed: () {
+              Navigator.pop(context);
+              Navigator.of(context).push(
+                MaterialPageRoute(
+                  builder: (context) => MessagesScreen(),
+                ),
+              );
+            },
+            style: ElevatedButton.styleFrom(
+              backgroundColor: AppColors.primary,
+            ),
+            child: Text(
+              'Iniciar Chat',
+              style: TextStyle(color: Colors.white),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _showBuyOrOfferDialog() {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text('Comprar o Hacer Oferta'),
+        content: Text('¿Quieres comprar esta carta o hacer una oferta?'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: Text('Cancelar'),
+          ),
+          ElevatedButton(
+            onPressed: () {
+              Navigator.pop(context);
+              // TODO: Implementar lógica de compra o oferta
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(content: Text('Función de compra/oferta próximamente')),
+              );
+            },
+            style: ElevatedButton.styleFrom(
+              backgroundColor: AppColors.primary,
+            ),
+            child: Text(
+              'Comprar',
+              style: TextStyle(color: Colors.white),
+            ),
+          ),
+          ElevatedButton(
+            onPressed: () {
+              Navigator.pop(context);
+              // TODO: Implementar lógica de oferta
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(content: Text('Función de oferta próximamente')),
+              );
+            },
+            style: ElevatedButton.styleFrom(
+              backgroundColor: AppColors.primary,
+            ),
+            child: Text(
+              'Hacer Oferta',
+              style: TextStyle(color: Colors.white),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _shareCard() {
+    final String shareText = '¡Mira esta carta! ${widget.card.name} - \$${widget.card.price?.toStringAsFixed(2) ?? '0.00'} USD';
+    
+    // Simular copiar al portapapeles
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text('Enlace copiado al portapapeles'),
+        backgroundColor: AppColors.buyGreen,
+        action: SnackBarAction(
+          label: 'Ver',
+          textColor: Colors.white,
+          onPressed: () {
+            // Aquí podrías abrir un diálogo con más opciones de compartir
+            _showShareOptions();
+          },
+        ),
+      ),
+    );
+  }
+
+  void _showShareOptions() {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text('Compartir Carta'),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            ListTile(
+              leading: Icon(Icons.copy, color: AppColors.primary),
+              title: Text('Copiar enlace'),
+              onTap: () {
+                Navigator.pop(context);
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(content: Text('Enlace copiado')),
+                );
+              },
+            ),
+            ListTile(
+              leading: Icon(Icons.share, color: AppColors.primary),
+              title: Text('Compartir en redes sociales'),
+              onTap: () {
+                Navigator.pop(context);
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(content: Text('Función próximamente')),
+                );
+              },
+            ),
+            ListTile(
+              leading: Icon(Icons.email, color: AppColors.primary),
+              title: Text('Enviar por email'),
+              onTap: () {
+                Navigator.pop(context);
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(content: Text('Función próximamente')),
+                );
+              },
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: Text('Cancelar'),
+          ),
+        ],
+      ),
+    );
   }
 } 
