@@ -3,7 +3,7 @@
 <div align="center">
   <img src="https://img.shields.io/badge/Flutter-02569B?style=for-the-badge&logo=flutter&logoColor=white" alt="Flutter">
   <img src="https://img.shields.io/badge/Dart-0175C2?style=for-the-badge&logo=dart&logoColor=white" alt="Dart">
-  <img src="https://img.shields.io/badge/SQLite-07405E?style=for-the-badge&logo=sqlite&logoColor=white" alt="SQLite">
+  <img src="https://img.shields.io/badge/Hive-FF6B35?style=for-the-badge&logo=flutter&logoColor=white" alt="Hive">
   <img src="https://img.shields.io/badge/Riverpod-0066FF?style=for-the-badge" alt="Riverpod">
 </div>
 
@@ -83,8 +83,7 @@ CardX/
 - **Providers** para servicios de datos
 
 ### 💾 Persistencia
-- **Hive** para configuración y datos de usuario
-- **SQLite** para datos de la aplicación
+- **Hive** para base de datos local y configuración
 - **Cached Network Image** para optimización de imágenes
 
 ---
@@ -101,13 +100,40 @@ CardX/
 
 ## 🗄️ Base de Datos
 
-```sql
--- Estructura principal
-users (id, email, display_name, photo_url, created_at, updated_at)
-cards (id, name, game, image_url, set_name, rarity, price, ...)
-auctions (id, title, description, seller_id, current_price, end_date, ...)
-bids (id, auction_id, bidder_id, amount, created_at)
-auction_watches (user_id, auction_id)
+```dart
+// Estructura con Hive
+@HiveType(typeId: 0)
+class User extends HiveObject {
+  @HiveField(0)
+  String? id;
+  @HiveField(1)  
+  String? email;
+  @HiveField(2)
+  String? displayName;
+  // ...
+}
+
+@HiveType(typeId: 1)
+class Card extends HiveObject {
+  @HiveField(0)
+  String? id;
+  @HiveField(1)
+  String? name;
+  @HiveField(2)
+  String? game;
+  // ...
+}
+
+@HiveType(typeId: 2)
+class Auction extends HiveObject {
+  @HiveField(0)
+  String? id;
+  @HiveField(1)
+  String? title;
+  @HiveField(2)
+  double? currentPrice;
+  // ...
+}
 ```
 
 ---
@@ -149,9 +175,8 @@ auction_watches (user_id, auction_id)
 ```yaml
 dependencies:
   flutter_riverpod: ^2.4.0    # State management
-  hive: ^2.2.3                # Persistencia local
+  hive: ^2.2.3                # Base de datos local
   hive_flutter: ^1.1.0
-  sqflite: ^2.3.0             # Base de datos SQLite
   fl_chart: ^0.65.0           # Gráficos interactivos
   cached_network_image: ^3.3.0 # Optimización de imágenes
   http: ^1.1.0                # Llamadas HTTP
