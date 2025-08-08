@@ -2,11 +2,15 @@ import 'package:flutter/material.dart';
 // import 'package:firebase_auth/firebase_auth.dart';
 // import 'package:cloud_firestore/cloud_firestore.dart';
 import '../../shared/models/user.dart';
+import 'hive_database_service.dart';
 
 class AuthService extends ChangeNotifier {
   // Firebase Auth instance (temporarily disabled)
   // final FirebaseAuth _auth = FirebaseAuth.instance;
   // final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+  
+  // Hive database service
+  final HiveDatabaseService _database = HiveDatabaseService.instance;
   
   // Temporary local state
   User? _currentUser;
@@ -16,6 +20,26 @@ class AuthService extends ChangeNotifier {
   User? get currentUser => _currentUser;
   bool get isLoading => _isLoading;
   bool get isAuthenticated => _currentUser != null;
+
+  // Constructor - load saved user from Hive
+  AuthService() {
+    _loadSavedUser();
+  }
+
+  // Load saved user from Hive
+  Future<void> _loadSavedUser() async {
+    try {
+      // Get the first user from database (for demo purposes)
+      // In a real app, you'd store the current user ID separately
+      final users = await _database.getAllUsers();
+      if (users.isNotEmpty) {
+        _currentUser = users.first;
+        notifyListeners();
+      }
+    } catch (e) {
+      print('Error loading saved user: $e');
+    }
+  }
 
   // Initialize auth state (temporarily disabled)
   // Future<void> initialize() async {
@@ -53,7 +77,7 @@ class AuthService extends ChangeNotifier {
   //   }
   // }
 
-  // Sign in with email and password (temporarily simplified)
+  // Sign in with email and password (with Hive persistence)
   Future<bool> signInWithEmailAndPassword(String email, String password) async {
     _isLoading = true;
     notifyListeners();
@@ -62,10 +86,17 @@ class AuthService extends ChangeNotifier {
       // Simulate API call delay
       await Future.delayed(Duration(seconds: 1));
       
-      // Temporary mock authentication
-      if (email.isNotEmpty && password.isNotEmpty) {
+      // Check if user exists in database
+      final users = await _database.getAllUsers();
+      User? existingUser = users.where((user) => user.email == email).firstOrNull;
+      
+      if (existingUser != null) {
+        // User exists, load their data
+        _currentUser = existingUser;
+      } else {
+        // Create new user
         _currentUser = User(
-          id: 'temp_user_${DateTime.now().millisecondsSinceEpoch}',
+          id: 'user_${DateTime.now().millisecondsSinceEpoch}',
           email: email,
           displayName: email.split('@')[0],
           photoURL: '',
@@ -73,12 +104,14 @@ class AuthService extends ChangeNotifier {
           createdAt: DateTime.now(),
           updatedAt: DateTime.now(),
         );
-        _isLoading = false;
-        notifyListeners();
-        return true;
-      } else {
-        throw Exception('Email y contraseña son requeridos');
+        
+        // Save to Hive
+        await _database.insertUser(_currentUser!);
       }
+      
+      _isLoading = false;
+      notifyListeners();
+      return true;
     } catch (e) {
       _isLoading = false;
       notifyListeners();
@@ -86,7 +119,7 @@ class AuthService extends ChangeNotifier {
     }
   }
 
-  // Create user with email and password (temporarily simplified)
+  // Create user with email and password (with Hive persistence)
   Future<bool> createUserWithEmailAndPassword(String email, String password, String displayName) async {
     _isLoading = true;
     notifyListeners();
@@ -95,23 +128,31 @@ class AuthService extends ChangeNotifier {
       // Simulate API call delay
       await Future.delayed(Duration(seconds: 1));
       
-      // Temporary mock user creation
-      if (email.isNotEmpty && password.isNotEmpty && displayName.isNotEmpty) {
-        _currentUser = User(
-          id: 'temp_user_${DateTime.now().millisecondsSinceEpoch}',
-          email: email,
-          displayName: displayName,
-          photoURL: '',
-          joinDate: DateTime.now(),
-          createdAt: DateTime.now(),
-          updatedAt: DateTime.now(),
-        );
-        _isLoading = false;
-        notifyListeners();
-        return true;
-      } else {
-        throw Exception('Todos los campos son requeridos');
+      // Check if user already exists
+      final users = await _database.getAllUsers();
+      final existingUser = users.where((user) => user.email == email).firstOrNull;
+      
+      if (existingUser != null) {
+        throw Exception('El usuario ya existe con este email');
       }
+      
+      // Create new user
+      _currentUser = User(
+        id: 'user_${DateTime.now().millisecondsSinceEpoch}',
+        email: email,
+        displayName: displayName,
+        photoURL: '',
+        joinDate: DateTime.now(),
+        createdAt: DateTime.now(),
+        updatedAt: DateTime.now(),
+      );
+      
+      // Save to Hive
+      await _database.insertUser(_currentUser!);
+      
+      _isLoading = false;
+      notifyListeners();
+      return true;
     } catch (e) {
       _isLoading = false;
       notifyListeners();
@@ -119,7 +160,7 @@ class AuthService extends ChangeNotifier {
     }
   }
 
-  // Sign in with Google (temporarily disabled)
+  // Sign in with Google (with Hive persistence)
   Future<bool> signInWithGoogle() async {
     _isLoading = true;
     notifyListeners();
@@ -128,16 +169,28 @@ class AuthService extends ChangeNotifier {
       // Simulate API call delay
       await Future.delayed(Duration(seconds: 1));
       
-      // Temporary mock Google sign in
-      _currentUser = User(
-        id: 'google_user_${DateTime.now().millisecondsSinceEpoch}',
-        email: 'user@gmail.com',
-        displayName: 'Usuario Google',
-        photoURL: '',
-        joinDate: DateTime.now(),
-        createdAt: DateTime.now(),
-        updatedAt: DateTime.now(),
-      );
+      // Check if Google user exists
+      final users = await _database.getAllUsers();
+      User? existingUser = users.where((user) => user.email == 'user@gmail.com').firstOrNull;
+      
+      if (existingUser != null) {
+        _currentUser = existingUser;
+      } else {
+        // Create new Google user
+        _currentUser = User(
+          id: 'google_user_${DateTime.now().millisecondsSinceEpoch}',
+          email: 'user@gmail.com',
+          displayName: 'Usuario Google',
+          photoURL: '',
+          joinDate: DateTime.now(),
+          createdAt: DateTime.now(),
+          updatedAt: DateTime.now(),
+        );
+        
+        // Save to Hive
+        await _database.insertUser(_currentUser!);
+      }
+      
       _isLoading = false;
       notifyListeners();
       return true;
@@ -148,7 +201,7 @@ class AuthService extends ChangeNotifier {
     }
   }
 
-  // Sign in with Apple (temporarily disabled)
+  // Sign in with Apple (with Hive persistence)
   Future<bool> signInWithApple() async {
     _isLoading = true;
     notifyListeners();
@@ -157,16 +210,28 @@ class AuthService extends ChangeNotifier {
       // Simulate API call delay
       await Future.delayed(Duration(seconds: 1));
       
-      // Temporary mock Apple sign in
-      _currentUser = User(
-        id: 'apple_user_${DateTime.now().millisecondsSinceEpoch}',
-        email: 'user@icloud.com',
-        displayName: 'Usuario Apple',
-        photoURL: '',
-        joinDate: DateTime.now(),
-        createdAt: DateTime.now(),
-        updatedAt: DateTime.now(),
-      );
+      // Check if Apple user exists
+      final users = await _database.getAllUsers();
+      User? existingUser = users.where((user) => user.email == 'user@icloud.com').firstOrNull;
+      
+      if (existingUser != null) {
+        _currentUser = existingUser;
+      } else {
+        // Create new Apple user
+        _currentUser = User(
+          id: 'apple_user_${DateTime.now().millisecondsSinceEpoch}',
+          email: 'user@icloud.com',
+          displayName: 'Usuario Apple',
+          photoURL: '',
+          joinDate: DateTime.now(),
+          createdAt: DateTime.now(),
+          updatedAt: DateTime.now(),
+        );
+        
+        // Save to Hive
+        await _database.insertUser(_currentUser!);
+      }
+      
       _isLoading = false;
       notifyListeners();
       return true;
@@ -177,7 +242,7 @@ class AuthService extends ChangeNotifier {
     }
   }
 
-  // Sign in with Facebook (temporarily disabled)
+  // Sign in with Facebook (with Hive persistence)
   Future<bool> signInWithFacebook() async {
     _isLoading = true;
     notifyListeners();
@@ -186,16 +251,28 @@ class AuthService extends ChangeNotifier {
       // Simulate API call delay
       await Future.delayed(Duration(seconds: 1));
       
-      // Temporary mock Facebook sign in
-      _currentUser = User(
-        id: 'facebook_user_${DateTime.now().millisecondsSinceEpoch}',
-        email: 'user@facebook.com',
-        displayName: 'Usuario Facebook',
-        photoURL: '',
-        joinDate: DateTime.now(),
-        createdAt: DateTime.now(),
-        updatedAt: DateTime.now(),
-      );
+      // Check if Facebook user exists
+      final users = await _database.getAllUsers();
+      User? existingUser = users.where((user) => user.email == 'user@facebook.com').firstOrNull;
+      
+      if (existingUser != null) {
+        _currentUser = existingUser;
+      } else {
+        // Create new Facebook user
+        _currentUser = User(
+          id: 'facebook_user_${DateTime.now().millisecondsSinceEpoch}',
+          email: 'user@facebook.com',
+          displayName: 'Usuario Facebook',
+          photoURL: '',
+          joinDate: DateTime.now(),
+          createdAt: DateTime.now(),
+          updatedAt: DateTime.now(),
+        );
+        
+        // Save to Hive
+        await _database.insertUser(_currentUser!);
+      }
+      
       _isLoading = false;
       notifyListeners();
       return true;
@@ -206,7 +283,7 @@ class AuthService extends ChangeNotifier {
     }
   }
 
-  // Sign out (temporarily simplified)
+  // Sign out (with Hive persistence)
   Future<void> signOut() async {
     _isLoading = true;
     notifyListeners();
@@ -254,7 +331,7 @@ class AuthService extends ChangeNotifier {
     return resetPassword(email);
   }
 
-  // Update user profile (temporarily simplified)
+  // Update user profile (with Hive persistence)
   Future<void> updateProfile({String? displayName, String? photoURL}) async {
     if (_currentUser == null) return;
 
@@ -270,6 +347,9 @@ class AuthService extends ChangeNotifier {
         photoURL: photoURL ?? _currentUser!.photoURL,
         updatedAt: DateTime.now(),
       );
+      
+      // Update in Hive
+      await _database.updateUser(_currentUser!);
       
       _isLoading = false;
       notifyListeners();

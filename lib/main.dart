@@ -4,15 +4,27 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'core/constants/app_colors.dart';
 import 'core/constants/app_typography.dart';
-import 'core/services/database_helper.dart';
+import 'core/services/hive_database_service.dart';
 import 'core/services/seed_data_service.dart';
 import 'core/services/auth_service.dart';
+import 'core/services/theme_service.dart';
 import 'core/widgets/auth_wrapper.dart';
+import 'features/auctions/auctions_screen.dart';
+import 'shared/widgets/search_screen.dart';
+import 'shared/widgets/favorites_screen.dart';
+import 'shared/widgets/profile_screen.dart';
+import 'shared/widgets/splash_screen.dart';
+import 'features/selling/sell_item_screen.dart';
 import 'dart:async';
 
 // Provider for AuthService
 final authServiceProvider = ChangeNotifierProvider<AuthService>((ref) {
   return AuthService();
+});
+
+// Provider for ThemeService
+final themeServiceProvider = ChangeNotifierProvider<ThemeService>((ref) {
+  return ThemeService();
 });
 
 void main() async {
@@ -21,8 +33,8 @@ void main() async {
   // Initialize Firebase (temporarily disabled)
   // await Firebase.initializeApp();
   
-  // Initialize database
-  await DatabaseHelper.instance.database;
+  // Initialize Hive database
+  await HiveDatabaseService.instance.initialize();
   
   // Seed database with sample data if empty
   final isEmpty = await SeedDataService.isDatabaseEmpty();
@@ -31,90 +43,37 @@ void main() async {
   }
 
   await Hive.initFlutter();
+  // Open Hive boxes
   await Hive.openBox('userBox');
   await Hive.openBox('usersBox');
+  await Hive.openBox('themeBox');
+  await Hive.openBox('collectionsBox');
+  await Hive.openBox('cartBox');
+  await Hive.openBox('messagesBox');
   
   runApp(const ProviderScope(child: CardXApp()));
 }
 
-class CardXApp extends StatelessWidget {
+class CardXApp extends ConsumerWidget {
   const CardXApp({super.key});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final themeService = ref.watch(themeServiceProvider);
+    
     return MaterialApp(
       title: 'CardX',
       debugShowCheckedModeBanner: false,
-      theme: ThemeData(
-        useMaterial3: true,
-        colorScheme: ColorScheme.fromSeed(
-          seedColor: AppColors.primary,
-          brightness: Brightness.light,
-        ),
-        textTheme: TextTheme(
-          displayLarge: AppTypography.h1,
-          displayMedium: AppTypography.h2,
-          displaySmall: AppTypography.h3,
-          headlineMedium: AppTypography.h4,
-          headlineSmall: AppTypography.h5,
-          titleLarge: AppTypography.h6,
-          bodyLarge: AppTypography.bodyLarge,
-          bodyMedium: AppTypography.bodyMedium,
-          bodySmall: AppTypography.bodySmall,
-          labelLarge: AppTypography.labelLarge,
-          labelMedium: AppTypography.labelMedium,
-          labelSmall: AppTypography.labelSmall,
-        ),
-        appBarTheme: AppBarTheme(
-          backgroundColor: AppColors.background,
-          foregroundColor: AppColors.primary,
-          elevation: 0,
-          centerTitle: true,
-          titleTextStyle: AppTypography.h4.copyWith(
-            color: AppColors.primary,
-            fontWeight: FontWeight.bold,
-          ),
-        ),
-        elevatedButtonTheme: ElevatedButtonThemeData(
-          style: ElevatedButton.styleFrom(
-            backgroundColor: AppColors.accent,
-            foregroundColor: AppColors.textInverse,
-            textStyle: AppTypography.button,
-            padding: EdgeInsets.symmetric(
-              horizontal: 24,
-              vertical: 16,
-            ),
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(8),
-            ),
-          ),
-        ),
-        inputDecorationTheme: InputDecorationTheme(
-          filled: true,
-          fillColor: AppColors.grey50,
-          border: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(8),
-            borderSide: BorderSide(color: AppColors.border),
-          ),
-          enabledBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(8),
-            borderSide: BorderSide(color: AppColors.border),
-          ),
-          focusedBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(8),
-            borderSide: BorderSide(color: AppColors.accent, width: 2),
-          ),
-          contentPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 16),
-        ),
-        cardTheme: CardThemeData(
-          color: AppColors.background,
-          elevation: 2,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(12),
-          ),
-        ),
-      ),
-      home: AuthWrapper(),
+      theme: themeService.currentTheme,
+      home: SplashScreen(),
+      routes: {
+        '/auth': (context) => AuthWrapper(),
+        '/auctions': (context) => const AuctionsScreen(),
+        '/search': (context) => SearchScreen(),
+        '/favorites': (context) => FavoritesScreen(),
+        '/profile': (context) => ProfileScreen(),
+        '/sell-item': (context) => SellItemScreen(),
+      },
     );
   }
 }

@@ -1,14 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../core/constants/app_colors.dart';
 import '../../core/constants/app_typography.dart';
-import '../../core/services/pokemon_tcg_api_service.dart';
-import '../../core/services/yugioh_api_service.dart';
 import '../../core/services/tcg_api_service.dart';
-import '../../core/services/star_wars_unlimited_api_service.dart';
-import '../../core/services/pokemon_tcg_card_converter.dart';
-import '../../core/services/yugioh_card_converter.dart';
-import '../../core/services/tcg_card_converter.dart';
-import '../../core/services/star_wars_unlimited_card_converter.dart';
 import '../../shared/models/card.dart' as card_model;
 import '../../shared/widgets/card_tile.dart';
 import 'tcg_card_detail_screen.dart';
@@ -33,6 +26,7 @@ class TcgCardListScreen extends StatefulWidget {
 
 class _TcgCardListScreenState extends State<TcgCardListScreen> {
   final TextEditingController _searchController = TextEditingController();
+  final TcgApiService _tcgApiService = TcgApiService();
   bool _isLoading = false;
   List<card_model.Card> _cards = [];
   List<card_model.Card> _filteredCards = [];
@@ -51,71 +45,60 @@ class _TcgCardListScreenState extends State<TcgCardListScreen> {
   }
 
   Future<void> _fetchCards() async {
-    setState(() => _isLoading = true);
-    
+    setState(() {
+      _isLoading = true;
+    });
+
     try {
       List<card_model.Card> cards = [];
       
-      switch (widget.tcgName) {
-        case 'Pokémon':
-          final pokemonService = PokemonTcgApiService();
-          final apiCards = await pokemonService.getPopularCards();
-          cards = PokemonTcgCardConverter.fromApiDataList(apiCards.take(6).toList());
+      switch (widget.tcgName.toLowerCase()) {
+        case 'pokémon':
+          cards = await _tcgApiService.getPokemonCards();
           break;
-          
-        case 'Yu-Gi-Oh!':
-          final yugiohService = YugiohApiService();
-          final apiCards = await yugiohService.getPopularCards();
-          cards = YugiohCardConverter.fromApiDataList(apiCards.take(6).toList());
+        case 'yugioh':
+          cards = await _tcgApiService.getYugiohCards();
           break;
-          
-        case 'Magic':
-          final tcgService = TcgApiService();
-          final apiCards = await tcgService.getPopularCards(TcgGame.magic);
-          cards = TcgCardConverter.fromApiDataList(apiCards.take(6).toList(), card_model.CardGame.mtg);
+        case 'magic':
+          cards = await _tcgApiService.getMagicCards();
           break;
-          
-        case 'One Piece':
-          final tcgService = TcgApiService();
-          final apiCards = await tcgService.getPopularCards(TcgGame.onePiece);
-          cards = TcgCardConverter.fromApiDataList(apiCards.take(6).toList(), card_model.CardGame.pokemon); // Using pokemon as placeholder
+        case 'one piece':
+          cards = await _tcgApiService.getOnePieceCards();
           break;
-          
-        case 'Dragon Ball Super':
-          final tcgService = TcgApiService();
-          final apiCards = await tcgService.getPopularCards(TcgGame.dragonBall);
-          cards = TcgCardConverter.fromApiDataList(apiCards.take(6).toList(), card_model.CardGame.pokemon); // Using pokemon as placeholder
+        case 'dragon ball':
+          cards = await _tcgApiService.getDragonBallCards();
           break;
-          
-        case 'Gundam':
-          final tcgService = TcgApiService();
-          final apiCards = await tcgService.getPopularCards(TcgGame.gundam);
-          cards = TcgCardConverter.fromApiDataList(apiCards.take(6).toList(), card_model.CardGame.pokemon); // Using pokemon as placeholder
+        case 'digimon':
+          cards = await _tcgApiService.getDigimonCards();
           break;
-          
-        case 'Star Wars Unlimited':
-          final starWarsService = StarWarsUnlimitedApiService();
-          final apiCards = await starWarsService.getPopularCards();
-          cards = StarWarsUnlimitedCardConverter.fromApiDataList(apiCards.take(6).toList());
+        case 'gundam':
+          cards = await _tcgApiService.getGundamCards();
+          break;
+        case 'star wars':
+          cards = await _tcgApiService.getStarWarsCards();
           break;
           
         default:
           cards = [];
       }
       
-      setState(() {
-        _cards = cards;
-        _filteredCards = cards;
-        _isLoading = false;
-      });
+      if (mounted) {
+        setState(() {
+          _cards = cards;
+          _filteredCards = cards;
+          _isLoading = false;
+        });
+      }
       
     } catch (e) {
       print('Error fetching cards for ${widget.tcgName}: $e');
-      setState(() {
-        _cards = _getFallbackCards();
-        _filteredCards = _cards;
-        _isLoading = false;
-      });
+      if (mounted) {
+        setState(() {
+          _cards = _getFallbackCards();
+          _filteredCards = _cards;
+          _isLoading = false;
+        });
+      }
     }
   }
 

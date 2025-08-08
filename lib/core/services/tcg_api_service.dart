@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import '../constants/secrets.dart';
+import '../../shared/models/card.dart';
 
 enum TcgGame {
   pokemon,
@@ -11,6 +12,7 @@ enum TcgGame {
   unionArena,
   gundam,
   starWarsUnlimited,
+  yugioh,
 }
 
 class TcgApiService {
@@ -34,11 +36,13 @@ class TcgApiService {
         return '$_baseUrl/gundam/cards';
       case TcgGame.starWarsUnlimited:
         return '$_baseUrl/star-wars-unlimited/cards';
+      case TcgGame.yugioh:
+        return '$_baseUrl/yugioh/cards';
     }
   }
 
   // Search cards by property and value
-  Future<List<Map<String, dynamic>>> searchCards({
+  Future<List<Card>> searchCards({
     required TcgGame game,
     String? property,
     String? value,
@@ -76,7 +80,14 @@ class TcgApiService {
         final List cards = data['data'] ?? [];
         print('TCG API - Found ${cards.length} ${game.name} cards');
         
-        return List<Map<String, dynamic>>.from(cards);
+        return cards.map((cardData) {
+          return Card.fromJson({
+            ...cardData,
+            'game': game.name,
+            'createdAt': DateTime.now().toIso8601String(),
+            'updatedAt': DateTime.now().toIso8601String(),
+          });
+        }).toList();
       } else {
         print('Error searching ${game.name} cards: ${response.statusCode}');
         print('Error response body: ${response.body}');
@@ -89,7 +100,7 @@ class TcgApiService {
   }
 
   // Search cards by name
-  Future<List<Map<String, dynamic>>> searchCardsByName({
+  Future<List<Card>> searchCardsByName({
     required TcgGame game,
     required String name,
     int page = 1,
@@ -104,8 +115,41 @@ class TcgApiService {
     );
   }
 
+  // Get cards for each game
+  Future<List<Card>> getPokemonCards() async {
+    return await searchCards(game: TcgGame.pokemon, limit: 10);
+  }
+
+  Future<List<Card>> getYugiohCards() async {
+    return await searchCards(game: TcgGame.yugioh, limit: 10);
+  }
+
+  Future<List<Card>> getOnePieceCards() async {
+    return await searchCards(game: TcgGame.onePiece, limit: 10);
+  }
+
+  Future<List<Card>> getDragonBallCards() async {
+    return await searchCards(game: TcgGame.dragonBall, limit: 10);
+  }
+
+  Future<List<Card>> getDigimonCards() async {
+    return await searchCards(game: TcgGame.digimon, limit: 10);
+  }
+
+  Future<List<Card>> getMagicCards() async {
+    return await searchCards(game: TcgGame.magic, limit: 10);
+  }
+
+  Future<List<Card>> getGundamCards() async {
+    return await searchCards(game: TcgGame.gundam, limit: 10);
+  }
+
+  Future<List<Card>> getStarWarsCards() async {
+    return await searchCards(game: TcgGame.starWarsUnlimited, limit: 10);
+  }
+
   // Get popular cards for each game
-  Future<List<Map<String, dynamic>>> getPopularCards(TcgGame game) async {
+  Future<List<Card>> getPopularCards(TcgGame game) async {
     try {
       print('TCG API - Getting popular ${game.name} cards');
       
@@ -224,9 +268,23 @@ class TcgApiService {
             'Emperor Palpatine',
           ];
           break;
+        case TcgGame.yugioh:
+          popularCardNames = [
+            'Blue-Eyes White Dragon',
+            'Dark Magician',
+            'Exodia',
+            'Red-Eyes Black Dragon',
+            'Black Luster Soldier',
+            'Dark Magician Girl',
+            'Stardust Dragon',
+            'Number 39: Utopia',
+            'Odd-Eyes Pendulum Dragon',
+            'Firewall Dragon',
+          ];
+          break;
       }
       
-      List<Map<String, dynamic>> popularCards = [];
+      List<Card> popularCards = [];
       
       for (String cardName in popularCardNames) {
         try {
@@ -248,7 +306,7 @@ class TcgApiService {
   }
 
   // Get cards by rarity
-  Future<List<Map<String, dynamic>>> getCardsByRarity({
+  Future<List<Card>> getCardsByRarity({
     required TcgGame game,
     required String rarity,
     int page = 1,
@@ -264,7 +322,7 @@ class TcgApiService {
   }
 
   // Get cards by type
-  Future<List<Map<String, dynamic>>> getCardsByType({
+  Future<List<Card>> getCardsByType({
     required TcgGame game,
     required String type,
     int page = 1,
@@ -278,4 +336,4 @@ class TcgApiService {
       limit: limit,
     );
   }
-} 
+}

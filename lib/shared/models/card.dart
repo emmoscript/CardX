@@ -1,9 +1,6 @@
 // Temporarily converted to regular class to fix Freezed issues
 // import 'package:freezed_annotation/freezed_annotation.dart';
 
-// part 'card.freezed.dart';
-// part 'card.g.dart';
-
 import 'dart:convert';
 
 enum CardGame {

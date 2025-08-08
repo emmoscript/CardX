@@ -39,7 +39,9 @@ class AuctionSlider extends StatelessWidget {
               Text('Subastas', style: AppTypography.h4.copyWith(fontWeight: FontWeight.bold)),
               Spacer(),
               TextButton(
-                onPressed: () {},
+                onPressed: () {
+                  Navigator.of(context).pushNamed('/auctions');
+                },
                 child: Text('Ver más', style: AppTypography.labelLarge.copyWith(color: AppColors.primary)),
               ),
             ],
@@ -54,102 +56,111 @@ class AuctionSlider extends StatelessWidget {
             separatorBuilder: (_, __) => SizedBox(width: 16),
             itemBuilder: (context, index) {
               final auction = auctions[index];
-              return Container(
-                width: 200,
-                height: 160,
-                clipBehavior: Clip.hardEdge,
-                decoration: BoxDecoration(
-                  color: AppColors.background,
-                  borderRadius: BorderRadius.circular(16),
-                  boxShadow: [
-                    BoxShadow(
-                      color: AppColors.shadowLight.withOpacity(0.10),
-                      blurRadius: 8,
-                      offset: Offset(0, 2),
-                    ),
-                  ],
-                ),
-                child: Stack(
-                  children: [
-                    // Imagen de fondo
-                    Positioned.fill(
-                      child: Image.asset(
-                        auction['image'] as String,
-                        fit: BoxFit.cover,
-                        errorBuilder: (_, __, ___) => Container(
-                          color: AppColors.grey100,
-                          child: Icon(Icons.image, size: 40, color: AppColors.grey400),
-                        ),
+              return GestureDetector(
+                onTap: () {
+                  // Navigate to specific auction
+                  Navigator.of(context).pushNamed('/auctions');
+                },
+                child: Container(
+                  width: 200,
+                  height: 160,
+                  clipBehavior: Clip.hardEdge,
+                  decoration: BoxDecoration(
+                    color: AppColors.background,
+                    borderRadius: BorderRadius.circular(16),
+                    boxShadow: [
+                      BoxShadow(
+                        color: AppColors.shadowLight.withOpacity(0.10),
+                        blurRadius: 8,
+                        offset: Offset(0, 2),
                       ),
-                    ),
-                    // Degradado negro
-                    Positioned.fill(
-                      child: Container(
-                        decoration: BoxDecoration(
-                          gradient: LinearGradient(
-                            begin: Alignment.topCenter,
-                            end: Alignment.bottomCenter,
-                            colors: [
-                              Colors.black.withOpacity(0.55),
-                              Colors.black.withOpacity(0.85),
-                            ],
+                    ],
+                  ),
+                  child: Stack(
+                    children: [
+                      // Imagen de fondo
+                      Positioned.fill(
+                        child: Image.asset(
+                          auction['image'] as String,
+                          fit: BoxFit.cover,
+                          errorBuilder: (_, __, ___) => Container(
+                            color: AppColors.grey100,
+                            child: Icon(Icons.image, size: 40, color: AppColors.grey400),
                           ),
                         ),
                       ),
-                    ),
-                    // Contenido encima
-                    Padding(
-                      padding: const EdgeInsets.all(11.0),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Container(
-                            padding: EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-                            decoration: BoxDecoration(
-                              color: (auction['statusColor'] as Color).withOpacity(0.18),
-                              borderRadius: BorderRadius.circular(8),
-                            ),
-                            child: Text(
-                              auction['status'] as String,
-                              style: AppTypography.labelSmall.copyWith(
-                                color: auction['statusColor'] as Color,
-                                fontWeight: FontWeight.bold,
-                                fontSize: 11,
-                              ),
+                      // Degradado negro
+                      Positioned.fill(
+                        child: Container(
+                          decoration: BoxDecoration(
+                            gradient: LinearGradient(
+                              begin: Alignment.topCenter,
+                              end: Alignment.bottomCenter,
+                              colors: [
+                                Colors.black.withOpacity(0.55),
+                                Colors.black.withOpacity(0.85),
+                              ],
                             ),
                           ),
-                          SizedBox(height: 4),
-                          Text(
-                            auction['date'] as String,
-                            style: AppTypography.labelSmall.copyWith(color: Colors.white, fontSize: 11),
-                          ),
-                          SizedBox(height: 8),
-                          Text(
-                            auction['title'] as String,
-                            style: AppTypography.bodyLarge.copyWith(fontWeight: FontWeight.bold, color: Colors.white, fontSize: 15),
-                            maxLines: 2,
-                            overflow: TextOverflow.ellipsis,
-                          ),
-                          Spacer(),
-                          SizedBox(
-                            width: double.infinity,
-                            child: ElevatedButton(
-                              style: ElevatedButton.styleFrom(
-                                backgroundColor: Colors.white.withOpacity(0.18),
-                                foregroundColor: Colors.white,
-                                shadowColor: Colors.transparent,
-                                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-                                padding: EdgeInsets.symmetric(vertical: 6),
-                                textStyle: AppTypography.labelLarge.copyWith(fontWeight: FontWeight.bold, fontSize: 12),
-                              ),
-                              onPressed: () {},
-                              child: Text('Ver más'),
-                            ),
-                          ),
-                        ],
+                        ),
                       ),
-                    ),
-                  ],
+                      // Contenido encima
+                      Padding(
+                        padding: const EdgeInsets.all(11.0),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Container(
+                              padding: EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                              decoration: BoxDecoration(
+                                color: (auction['statusColor'] as Color).withOpacity(0.18),
+                                borderRadius: BorderRadius.circular(8),
+                              ),
+                              child: Text(
+                                auction['status'] as String,
+                                style: AppTypography.labelSmall.copyWith(
+                                  color: auction['statusColor'] as Color,
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 11,
+                                ),
+                              ),
+                            ),
+                            SizedBox(height: 4),
+                            Text(
+                              auction['date'] as String,
+                              style: AppTypography.labelSmall.copyWith(color: Colors.white, fontSize: 11),
+                            ),
+                            SizedBox(height: 8),
+                            Text(
+                              auction['title'] as String,
+                              style: AppTypography.bodyLarge.copyWith(fontWeight: FontWeight.bold, color: Colors.white, fontSize: 15),
+                              maxLines: 2,
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                            Spacer(),
+                            SizedBox(
+                              width: double.infinity,
+                              child: ElevatedButton(
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: Colors.white.withOpacity(0.18),
+                                  foregroundColor: Colors.white,
+                                  shadowColor: Colors.transparent,
+                                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                                  padding: EdgeInsets.symmetric(vertical: 6),
+                                  textStyle: AppTypography.labelLarge.copyWith(fontWeight: FontWeight.bold, fontSize: 12),
+                                ),
+                                onPressed: () {
+                                  // Navegar a la pantalla de subastas
+                                  Navigator.of(context).pushNamed('/auctions');
+                                },
+                                child: Text('Ver más'),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
               );
             },

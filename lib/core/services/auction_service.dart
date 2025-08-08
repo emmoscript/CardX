@@ -3,7 +3,7 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:sqflite/sqflite.dart';
 import '../constants/secrets.dart';
 import '../../shared/models/auction.dart';
-import '../../shared/models/card.dart';
+import '../../shared/models/card.dart' as card_model;
 import '../../shared/models/user.dart';
 import 'database_helper.dart';
 
@@ -16,67 +16,231 @@ class AuctionService {
 
   // Obtener todas las subastas activas
   Future<List<Auction>> getActiveAuctions({AuctionFilter? filter}) async {
-    final db = await _databaseHelper.database;
-    
-    String query = '''
-      SELECT a.*, c.*, u.display_name as seller_name, u.photo_url as seller_avatar
-      FROM auctions a
-      LEFT JOIN cards c ON a.card_id = c.id
-      LEFT JOIN users u ON a.seller_id = u.id
-      WHERE a.status IN ('active', 'bidding')
-    ''';
-    
-    List<dynamic> args = [];
+    // For now, return mock data instead of database query
+    final now = DateTime.now();
+    final mockAuctions = [
+      Auction(
+        id: 'auction-1',
+        title: 'Charizard Base Set Holo',
+        description: 'Charizard holográfico de Base Set en excelente condición',
+        card: card_model.Card(
+          id: 'card-1',
+          name: 'Charizard',
+          game: card_model.CardGame.pokemon,
+          imageUrl: 'https://images.pokemontcg.io/base1/4.png',
+          setName: 'Base Set',
+          rarity: card_model.CardRarity.rareHolo,
+          price: 299.99,
+          isForSale: true,
+          isForTrade: false,
+          createdAt: now.subtract(Duration(days: 1)),
+          updatedAt: now,
+        ),
+        currentPrice: 299.99,
+        startingPrice: 250.00,
+        startTime: now.subtract(Duration(days: 1)),
+        endTime: now.add(Duration(days: 2)),
+        sellerId: 'user_001',
+        sellerName: 'Master Collector',
+        status: AuctionStatus.active,
+        type: AuctionType.standard,
+        tcg: 'Pokémon',
+        imageUrl: 'https://images.pokemontcg.io/base1/4.png',
+        setName: 'Base Set',
+        bidCount: 5,
+        views: 45,
+        isWatched: false,
+        sellerJoinDate: now.subtract(Duration(days: 365)),
+        createdAt: now.subtract(Duration(days: 1)),
+        updatedAt: now,
+      ),
+      Auction(
+        id: 'auction-2',
+        title: 'Blue-Eyes White Dragon LOB',
+        description: 'Blue-Eyes White Dragon de Legend of Blue Eyes White Dragon',
+        card: card_model.Card(
+          id: 'card-2',
+          name: 'Blue-Eyes White Dragon',
+          game: card_model.CardGame.yugioh,
+          imageUrl: 'https://images.ygoprodeck.com/images/cards/89631139.jpg',
+          setName: 'Legend of Blue Eyes White Dragon',
+          rarity: card_model.CardRarity.ultraRare,
+          price: 85.50,
+          isForSale: true,
+          isForTrade: false,
+          createdAt: now.subtract(Duration(hours: 6)),
+          updatedAt: now,
+        ),
+        currentPrice: 85.50,
+        startingPrice: 75.00,
+        startTime: now.subtract(Duration(hours: 6)),
+        endTime: now.add(Duration(hours: 12)),
+        sellerId: 'user_002',
+        sellerName: 'Pokémon Fan',
+        status: AuctionStatus.active,
+        type: AuctionType.standard,
+        tcg: 'Yu-Gi-Oh!',
+        imageUrl: 'https://images.ygoprodeck.com/images/cards/89631139.jpg',
+        setName: 'Legend of Blue Eyes White Dragon',
+        bidCount: 3,
+        views: 28,
+        isWatched: true,
+        sellerJoinDate: now.subtract(Duration(days: 180)),
+        createdAt: now.subtract(Duration(hours: 6)),
+        updatedAt: now,
+      ),
+      Auction(
+        id: 'auction-3',
+        title: 'Black Lotus Alpha',
+        description: 'Black Lotus de Alpha en buena condición',
+        card: card_model.Card(
+          id: 'card-3',
+          name: 'Black Lotus',
+          game: card_model.CardGame.mtg,
+          imageUrl: 'https://via.placeholder.com/250x350/000000/FFFFFF?text=Black+Lotus',
+          setName: 'Alpha',
+          rarity: card_model.CardRarity.rare,
+          price: 15000.00,
+          isForSale: true,
+          isForTrade: false,
+          createdAt: now.subtract(Duration(days: 2)),
+          updatedAt: now,
+        ),
+        currentPrice: 15000.00,
+        startingPrice: 14000.00,
+        startTime: now.subtract(Duration(days: 2)),
+        endTime: now.add(Duration(days: 5)),
+        sellerId: 'user_003',
+        sellerName: 'MTG Player',
+        status: AuctionStatus.active,
+        type: AuctionType.standard,
+        tcg: 'Magic',
+        imageUrl: 'https://via.placeholder.com/250x350/000000/FFFFFF?text=Black+Lotus',
+        setName: 'Alpha',
+        bidCount: 2,
+        views: 156,
+        isWatched: false,
+        sellerJoinDate: now.subtract(Duration(days: 90)),
+        createdAt: now.subtract(Duration(days: 2)),
+        updatedAt: now,
+      ),
+      Auction(
+        id: 'auction-4',
+        title: 'Pikachu Base Set',
+        description: 'Pikachu común de Base Set en condición mint',
+        card: card_model.Card(
+          id: 'card-4',
+          name: 'Pikachu',
+          game: card_model.CardGame.pokemon,
+          imageUrl: 'https://images.pokemontcg.io/base1/58.png',
+          setName: 'Base Set',
+          rarity: card_model.CardRarity.common,
+          price: 15.99,
+          isForSale: true,
+          isForTrade: false,
+          createdAt: now.subtract(Duration(hours: 2)),
+          updatedAt: now,
+        ),
+        currentPrice: 15.99,
+        startingPrice: 10.00,
+        startTime: now.subtract(Duration(hours: 2)),
+        endTime: now.add(Duration(hours: 24)),
+        sellerId: 'user_001',
+        sellerName: 'Master Collector',
+        status: AuctionStatus.active,
+        type: AuctionType.standard,
+        tcg: 'Pokémon',
+        imageUrl: 'https://images.pokemontcg.io/base1/58.png',
+        setName: 'Base Set',
+        bidCount: 8,
+        views: 32,
+        isWatched: false,
+        sellerJoinDate: now.subtract(Duration(days: 365)),
+        createdAt: now.subtract(Duration(hours: 2)),
+        updatedAt: now,
+      ),
+      Auction(
+        id: 'auction-5',
+        title: 'Dark Magician LOB',
+        description: 'Dark Magician de Legend of Blue Eyes White Dragon',
+        card: card_model.Card(
+          id: 'card-5',
+          name: 'Dark Magician',
+          game: card_model.CardGame.yugioh,
+          imageUrl: 'https://images.ygoprodeck.com/images/cards/46986414.jpg',
+          setName: 'Legend of Blue Eyes White Dragon',
+          rarity: card_model.CardRarity.ultraRare,
+          price: 45.75,
+          isForSale: true,
+          isForTrade: false,
+          createdAt: now.subtract(Duration(days: 1)),
+          updatedAt: now,
+        ),
+        currentPrice: 45.75,
+        startingPrice: 40.00,
+        startTime: now.subtract(Duration(days: 1)),
+        endTime: now.add(Duration(days: 1)),
+        sellerId: 'user_002',
+        sellerName: 'Pokémon Fan',
+        status: AuctionStatus.active,
+        type: AuctionType.standard,
+        tcg: 'Yu-Gi-Oh!',
+        imageUrl: 'https://images.ygoprodeck.com/images/cards/46986414.jpg',
+        setName: 'Legend of Blue Eyes White Dragon',
+        bidCount: 4,
+        views: 67,
+        isWatched: true,
+        sellerJoinDate: now.subtract(Duration(days: 180)),
+        createdAt: now.subtract(Duration(days: 1)),
+        updatedAt: now,
+      ),
+    ];
+
+    // Apply filters if provided
+    List<Auction> filteredAuctions = mockAuctions;
     
     if (filter != null) {
-      if (filter.tcg != null) {
-        query += ' AND a.tcg = ?';
-        args.add(filter.tcg);
+      if (filter.tcg != null && filter.tcg != 'all') {
+        filteredAuctions = filteredAuctions.where((auction) => 
+          auction.tcg.toLowerCase() == filter.tcg!.toLowerCase()
+        ).toList();
       }
+      
       if (filter.minPrice != null) {
-        query += ' AND a.current_price >= ?';
-        args.add(filter.minPrice);
+        filteredAuctions = filteredAuctions.where((auction) => 
+          auction.currentPrice >= filter.minPrice!
+        ).toList();
       }
+      
       if (filter.maxPrice != null) {
-        query += ' AND a.current_price <= ?';
-        args.add(filter.maxPrice);
-      }
-      if (filter.rarity != null) {
-        query += ' AND c.rarity = ?';
-        args.add(filter.rarity);
-      }
-      if (filter.cardSet != null) {
-        query += ' AND c.set_name = ?';
-        args.add(filter.cardSet);
-      }
-      if (filter.searchQuery != null && filter.searchQuery!.isNotEmpty) {
-        query += ' AND (a.title LIKE ? OR c.name LIKE ?)';
-        args.add('%${filter.searchQuery}%');
-        args.add('%${filter.searchQuery}%');
+        filteredAuctions = filteredAuctions.where((auction) => 
+          auction.currentPrice <= filter.maxPrice!
+        ).toList();
       }
     }
-    
-    // Ordenamiento
+
+    // Apply sorting
     if (filter?.sortBy != null) {
       switch (filter!.sortBy) {
         case 'price':
-          query += ' ORDER BY a.current_price ${filter.sortAscending == true ? 'ASC' : 'DESC'}';
+          filteredAuctions.sort((a, b) => filter.sortAscending == true 
+            ? a.currentPrice.compareTo(b.currentPrice)
+            : b.currentPrice.compareTo(a.currentPrice));
           break;
         case 'time':
-          query += ' ORDER BY a.end_time ${filter.sortAscending == true ? 'ASC' : 'DESC'}';
+          filteredAuctions.sort((a, b) => filter.sortAscending == true 
+            ? a.endTime.compareTo(b.endTime)
+            : b.endTime.compareTo(a.endTime));
           break;
         case 'popularity':
-          query += ' ORDER BY a.views DESC';
+          filteredAuctions.sort((a, b) => (b.views ?? 0).compareTo(a.views ?? 0));
           break;
         default:
-          query += ' ORDER BY a.created_at DESC';
+          filteredAuctions.sort((a, b) => (b.createdAt ?? now).compareTo(a.createdAt ?? now));
       }
-    } else {
-      query += ' ORDER BY a.created_at DESC';
     }
-    
-    final results = await db.rawQuery(query, args);
-    return results.map((row) => _mapRowToAuction(row)).toList();
+
+    return filteredAuctions;
   }
 
   // Obtener subasta por ID
@@ -249,35 +413,162 @@ class AuctionService {
 
   // Obtener subastas vigiladas
   Future<List<Auction>> getWatchedAuctions(String userId) async {
-    final db = await _databaseHelper.database;
+    // For now, return mock data for watched auctions
+    final now = DateTime.now();
+    final mockWatchedAuctions = [
+      Auction(
+        id: 'auction-2',
+        title: 'Blue-Eyes White Dragon LOB',
+        description: 'Blue-Eyes White Dragon de Legend of Blue Eyes White Dragon',
+        card: card_model.Card(
+          id: 'card-2',
+          name: 'Blue-Eyes White Dragon',
+          game: card_model.CardGame.yugioh,
+          imageUrl: 'https://images.ygoprodeck.com/images/cards/89631139.jpg',
+          setName: 'Legend of Blue Eyes White Dragon',
+          rarity: card_model.CardRarity.ultraRare,
+          price: 85.50,
+          isForSale: true,
+          isForTrade: false,
+          createdAt: now.subtract(Duration(hours: 6)),
+          updatedAt: now,
+        ),
+        currentPrice: 85.50,
+        startingPrice: 75.00,
+        startTime: now.subtract(Duration(hours: 6)),
+        endTime: now.add(Duration(hours: 12)),
+        sellerId: 'user_002',
+        sellerName: 'Pokémon Fan',
+        status: AuctionStatus.active,
+        type: AuctionType.standard,
+        tcg: 'Yu-Gi-Oh!',
+        imageUrl: 'https://images.ygoprodeck.com/images/cards/89631139.jpg',
+        setName: 'Legend of Blue Eyes White Dragon',
+        bidCount: 3,
+        views: 28,
+        isWatched: true,
+        sellerJoinDate: now.subtract(Duration(days: 180)),
+        createdAt: now.subtract(Duration(hours: 6)),
+        updatedAt: now,
+      ),
+      Auction(
+        id: 'auction-5',
+        title: 'Dark Magician LOB',
+        description: 'Dark Magician de Legend of Blue Eyes White Dragon',
+        card: card_model.Card(
+          id: 'card-5',
+          name: 'Dark Magician',
+          game: card_model.CardGame.yugioh,
+          imageUrl: 'https://images.ygoprodeck.com/images/cards/46986414.jpg',
+          setName: 'Legend of Blue Eyes White Dragon',
+          rarity: card_model.CardRarity.ultraRare,
+          price: 45.75,
+          isForSale: true,
+          isForTrade: false,
+          createdAt: now.subtract(Duration(days: 1)),
+          updatedAt: now,
+        ),
+        currentPrice: 45.75,
+        startingPrice: 40.00,
+        startTime: now.subtract(Duration(days: 1)),
+        endTime: now.add(Duration(days: 1)),
+        sellerId: 'user_002',
+        sellerName: 'Pokémon Fan',
+        status: AuctionStatus.active,
+        type: AuctionType.standard,
+        tcg: 'Yu-Gi-Oh!',
+        imageUrl: 'https://images.ygoprodeck.com/images/cards/46986414.jpg',
+        setName: 'Legend of Blue Eyes White Dragon',
+        bidCount: 4,
+        views: 67,
+        isWatched: true,
+        sellerJoinDate: now.subtract(Duration(days: 180)),
+        createdAt: now.subtract(Duration(days: 1)),
+        updatedAt: now,
+      ),
+    ];
     
-    final results = await db.rawQuery('''
-      SELECT a.*, c.*, u.display_name as seller_name, u.photo_url as seller_avatar
-      FROM auctions a
-      LEFT JOIN cards c ON a.card_id = c.id
-      LEFT JOIN users u ON a.seller_id = u.id
-      INNER JOIN auction_watches aw ON a.id = aw.auction_id
-      WHERE aw.user_id = ?
-      ORDER BY a.end_time ASC
-    ''', [userId]);
-    
-    return results.map((row) => _mapRowToAuction(row)).toList();
+    return mockWatchedAuctions;
   }
 
   // Obtener subastas del usuario
   Future<List<Auction>> getUserAuctions(String userId) async {
-    final db = await _databaseHelper.database;
+    // For now, return mock data for user auctions
+    final now = DateTime.now();
+    final mockUserAuctions = [
+      Auction(
+        id: 'auction-1',
+        title: 'Charizard Base Set Holo',
+        description: 'Charizard holográfico de Base Set en excelente condición',
+        card: card_model.Card(
+          id: 'card-1',
+          name: 'Charizard',
+          game: card_model.CardGame.pokemon,
+          imageUrl: 'https://images.pokemontcg.io/base1/4.png',
+          setName: 'Base Set',
+          rarity: card_model.CardRarity.rareHolo,
+          price: 299.99,
+          isForSale: true,
+          isForTrade: false,
+          createdAt: now.subtract(Duration(days: 1)),
+          updatedAt: now,
+        ),
+        currentPrice: 299.99,
+        startingPrice: 250.00,
+        startTime: now.subtract(Duration(days: 1)),
+        endTime: now.add(Duration(days: 2)),
+        sellerId: 'user_001',
+        sellerName: 'Master Collector',
+        status: AuctionStatus.active,
+        type: AuctionType.standard,
+        tcg: 'Pokémon',
+        imageUrl: 'https://images.pokemontcg.io/base1/4.png',
+        setName: 'Base Set',
+        bidCount: 5,
+        views: 45,
+        isWatched: false,
+        sellerJoinDate: now.subtract(Duration(days: 365)),
+        createdAt: now.subtract(Duration(days: 1)),
+        updatedAt: now,
+      ),
+      Auction(
+        id: 'auction-4',
+        title: 'Pikachu Base Set',
+        description: 'Pikachu común de Base Set en condición mint',
+        card: card_model.Card(
+          id: 'card-4',
+          name: 'Pikachu',
+          game: card_model.CardGame.pokemon,
+          imageUrl: 'https://images.pokemontcg.io/base1/58.png',
+          setName: 'Base Set',
+          rarity: card_model.CardRarity.common,
+          price: 15.99,
+          isForSale: true,
+          isForTrade: false,
+          createdAt: now.subtract(Duration(hours: 2)),
+          updatedAt: now,
+        ),
+        currentPrice: 15.99,
+        startingPrice: 10.00,
+        startTime: now.subtract(Duration(hours: 2)),
+        endTime: now.add(Duration(hours: 24)),
+        sellerId: 'user_001',
+        sellerName: 'Master Collector',
+        status: AuctionStatus.active,
+        type: AuctionType.standard,
+        tcg: 'Pokémon',
+        imageUrl: 'https://images.pokemontcg.io/base1/58.png',
+        setName: 'Base Set',
+        bidCount: 8,
+        views: 32,
+        isWatched: false,
+        sellerJoinDate: now.subtract(Duration(days: 365)),
+        createdAt: now.subtract(Duration(hours: 2)),
+        updatedAt: now,
+      ),
+    ];
     
-    final results = await db.rawQuery('''
-      SELECT a.*, c.*, u.display_name as seller_name, u.photo_url as seller_avatar
-      FROM auctions a
-      LEFT JOIN cards c ON a.card_id = c.id
-      LEFT JOIN users u ON a.seller_id = u.id
-      WHERE a.seller_id = ?
-      ORDER BY a.created_at DESC
-    ''', [userId]);
-    
-    return results.map((row) => _mapRowToAuction(row)).toList();
+    return mockUserAuctions;
   }
 
   // Finalizar subastas expiradas
@@ -297,18 +588,18 @@ class AuctionService {
       id: row['id'] as String,
       title: row['title'] as String,
       description: row['description'] as String,
-      card: Card(
+      card: card_model.Card(
         id: row['card_id'] as String,
         name: row['name'] as String,
         imageUrl: row['image_url'] as String?,
-        game: CardGame.values.firstWhere(
+        game: card_model.CardGame.values.firstWhere(
           (e) => e.name == row['game'],
-          orElse: () => CardGame.yugioh,
+          orElse: () => card_model.CardGame.yugioh,
         ),
         rarity: row['rarity'] != null 
-          ? CardRarity.values.firstWhere(
+          ? card_model.CardRarity.values.firstWhere(
               (e) => e.name == row['rarity'],
-              orElse: () => CardRarity.common,
+              orElse: () => card_model.CardRarity.common,
             )
           : null,
         setName: row['set_name'] as String?,

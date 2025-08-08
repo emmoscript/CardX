@@ -14,17 +14,19 @@ class PriceUpdateSlider extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    
     if (isLoading) {
       return Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          SizedBox(height: 18),
+          const SizedBox(height: 18),
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16.0),
             child: Row(
               children: [
                 Text('Actualización de precios', style: AppTypography.h4.copyWith(fontWeight: FontWeight.bold)),
-                Spacer(),
+                const Spacer(),
                 TextButton(
                   onPressed: () {},
                   child: Text('Ver más', style: AppTypography.labelLarge.copyWith(color: AppColors.primary)),
@@ -32,20 +34,20 @@ class PriceUpdateSlider extends StatelessWidget {
               ],
             ),
           ),
-          SizedBox(height: 10),
-          SizedBox(
-            height: 250,
-            child: ListView.separated(
-              padding: EdgeInsets.symmetric(horizontal: 16),
+          const SizedBox(height: 10),
+                     SizedBox(
+             height: 250,
+             child: ListView.separated(
+              padding: const EdgeInsets.symmetric(horizontal: 16),
               scrollDirection: Axis.horizontal,
               itemCount: 5,
-              separatorBuilder: (_, __) => SizedBox(width: 20),
+              separatorBuilder: (_, __) => const SizedBox(width: 20),
               itemBuilder: (context, index) {
                 return Container(
                   width: 180,
                   height: 250,
                   decoration: BoxDecoration(
-                    color: AppColors.grey100,
+                    color: theme.colorScheme.surface,
                     borderRadius: BorderRadius.circular(18),
                   ),
                   child: Center(
@@ -58,7 +60,7 @@ class PriceUpdateSlider extends StatelessWidget {
               },
             ),
           ),
-          SizedBox(height: 44),
+          const SizedBox(height: 44),
         ],
       );
     }
@@ -67,13 +69,13 @@ class PriceUpdateSlider extends StatelessWidget {
       return Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          SizedBox(height: 18),
+          const SizedBox(height: 18),
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16.0),
             child: Row(
               children: [
                 Text('Actualización de precios', style: AppTypography.h4.copyWith(fontWeight: FontWeight.bold)),
-                Spacer(),
+                const Spacer(),
                 TextButton(
                   onPressed: () {},
                   child: Text('Ver más', style: AppTypography.labelLarge.copyWith(color: AppColors.primary)),
@@ -81,17 +83,17 @@ class PriceUpdateSlider extends StatelessWidget {
               ],
             ),
           ),
-          SizedBox(height: 10),
-          SizedBox(
-            height: 250,
-            child: Center(
+          const SizedBox(height: 10),
+                     SizedBox(
+             height: 250,
+             child: Center(
               child: Text(
                 'No hay actualizaciones de precios disponibles',
-                style: AppTypography.bodyMedium.copyWith(color: AppColors.textSecondary),
+                style: AppTypography.bodyMedium.copyWith(color: theme.colorScheme.onSurface.withOpacity(0.6)),
               ),
             ),
           ),
-          SizedBox(height: 44),
+          const SizedBox(height: 44),
         ],
       );
     }
@@ -99,13 +101,13 @@ class PriceUpdateSlider extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        SizedBox(height: 18),
+        const SizedBox(height: 18),
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: 16.0),
           child: Row(
             children: [
               Text('Actualización de precios', style: AppTypography.h4.copyWith(fontWeight: FontWeight.bold)),
-              Spacer(),
+              const Spacer(),
               TextButton(
                 onPressed: () {},
                 child: Text('Ver más', style: AppTypography.labelLarge.copyWith(color: AppColors.primary)),
@@ -113,166 +115,264 @@ class PriceUpdateSlider extends StatelessWidget {
             ],
           ),
         ),
-        SizedBox(height: 10),
+        const SizedBox(height: 10),
         SizedBox(
-          height: 360,
+          height: 390, // Increased height to prevent overflow
           child: ListView.separated(
-            padding: EdgeInsets.symmetric(horizontal: 16),
+            padding: const EdgeInsets.symmetric(horizontal: 16),
             scrollDirection: Axis.horizontal,
             itemCount: cards.length,
-            separatorBuilder: (_, __) => SizedBox(width: 20),
+            separatorBuilder: (_, __) => const SizedBox(width: 20),
             itemBuilder: (context, index) {
               final card = cards[index];
-              // Simular tendencia de precio (en una app real esto vendría de la API)
               final trend = _generateRandomTrend();
               final seller = _generateRandomSeller();
               
-              return Container(
-                width: 180,
-                height: 340,
-                decoration: BoxDecoration(
-                  color: AppColors.background,
+              return Card(
+                elevation: 2,
+                shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(18),
-                  boxShadow: [
-                    BoxShadow(
-                      color: AppColors.shadowLight.withOpacity(0.06),
-                      blurRadius: 4,
-                      offset: Offset(0, 2),
-                    ),
-                  ],
                 ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    // Imagen de la carta
-                    ClipRRect(
-                      borderRadius: BorderRadius.vertical(top: Radius.circular(18)),
-                      child: AspectRatio(
-                        aspectRatio: 0.7,
-                        child: Image.network(
-                          card.imageUrl ?? 'https://via.placeholder.com/250x350/CCCCCC/FFFFFF?text=No+Image',
-                          fit: BoxFit.contain,
-                          loadingBuilder: (context, child, loadingProgress) {
-                            if (loadingProgress == null) return child;
-                            return Container(
-                              color: AppColors.grey100,
-                              child: Center(
-                                child: CircularProgressIndicator(
-                                  value: loadingProgress.expectedTotalBytes != null
-                                      ? loadingProgress.cumulativeBytesLoaded / loadingProgress.expectedTotalBytes!
-                                      : null,
-                                  strokeWidth: 2,
-                                  color: AppColors.primary,
+                child: Container(
+                  width: 180,
+                  height: 370, // Increased height to prevent overflow
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      // Imagen de la carta
+                      ClipRRect(
+                        borderRadius: const BorderRadius.vertical(top: Radius.circular(18)),
+                        child: AspectRatio(
+                          aspectRatio: 0.7,
+                          child: card.imageUrl != null && card.imageUrl!.isNotEmpty
+                            ? Image.network(
+                                card.imageUrl!,
+                                fit: BoxFit.cover,
+                                errorBuilder: (_, __, ___) => Container(
+                                  color: theme.colorScheme.surface,
+                                  child: Icon(Icons.image, size: 60, color: theme.colorScheme.onSurface.withOpacity(0.5)),
+                                ),
+                              )
+                            : Container(
+                                color: theme.colorScheme.surface,
+                                child: Icon(Icons.image, size: 60, color: theme.colorScheme.onSurface.withOpacity(0.5)),
+                              ),
+                        ),
+                      ),
+                      // Información de la carta
+                      Expanded(
+                        child: Padding(
+                          padding: const EdgeInsets.all(12),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              // Nombre de la carta
+                              Text(
+                                card.name,
+                                style: AppTypography.labelMedium.copyWith(
+                                  fontWeight: FontWeight.bold,
+                                  color: theme.colorScheme.onSurface,
+                                ),
+                                maxLines: 2,
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                              const SizedBox(height: 6), // Reduced spacing
+                              // Información del vendedor con avatar
+                              Row(
+                                children: [
+                                  CircleAvatar(
+                                    radius: 10, // Reduced size
+                                    backgroundColor: theme.colorScheme.primary.withOpacity(0.1),
+                                    child: Icon(
+                                      Icons.person,
+                                      size: 12, // Reduced size
+                                      color: theme.colorScheme.primary,
+                                    ),
+                                  ),
+                                  const SizedBox(width: 4), // Reduced spacing
+                                  Expanded(
+                                    child: Text(
+                                      seller,
+                                      style: AppTypography.labelSmall.copyWith(
+                                        color: theme.colorScheme.onSurface.withOpacity(0.7),
+                                        fontSize: 10, // Smaller font
+                                      ),
+                                      maxLines: 1,
+                                      overflow: TextOverflow.ellipsis,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              const SizedBox(height: 6), // Reduced spacing
+                              // Precio y tendencia
+                              Row(
+                                children: [
+                                  Expanded(
+                                    child: Text(
+                                      '\$${_formatPrice(card.price ?? 0)}',
+                                      style: AppTypography.labelMedium.copyWith(
+                                        fontWeight: FontWeight.bold,
+                                        color: AppColors.buyGreen,
+                                      ),
+                                    ),
+                                  ),
+                                  const SizedBox(width: 4), // Reduced spacing
+                                  _TrendBadge(trend: trend),
+                                ],
+                              ),
+                              const Spacer(),
+                              // Badge de juego
+                              Container(
+                                padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 1), // Reduced padding
+                                decoration: BoxDecoration(
+                                  color: _getGameColor(card.game).withOpacity(0.1),
+                                  borderRadius: BorderRadius.circular(3), // Smaller radius
+                                  border: Border.all(
+                                    color: _getGameColor(card.game).withOpacity(0.3),
+                                    width: 0.5,
+                                  ),
+                                ),
+                                child: Text(
+                                  card.game.shortName,
+                                  style: AppTypography.labelSmall.copyWith(
+                                    color: _getGameColor(card.game),
+                                    fontWeight: FontWeight.w600,
+                                    fontSize: 8, // Smaller font
+                                  ),
                                 ),
                               ),
-                            );
-                          },
-                          errorBuilder: (_, __, ___) => Container(
-                            color: AppColors.grey100,
-                            child: Icon(Icons.image, size: 60, color: AppColors.grey400),
+                            ],
                           ),
                         ),
                       ),
-                    ),
-                    SizedBox(height: 8),
-                    // Franja inferior con precio y porcentaje
-                    Container(
-                      width: double.infinity,
-                      padding: EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.vertical(bottom: Radius.circular(18)),
-                      ),
-                      child: Row(
-                        children: [
-                          Expanded(
-                            child: Text(
-                              '\$${_formatPrice(card.price ?? 0)} USD',
-                              style: AppTypography.h4.copyWith(fontWeight: FontWeight.bold, fontSize: 17, color: AppColors.primary),
-                              maxLines: 1,
-                              overflow: TextOverflow.ellipsis,
-                            ),
-                          ),
-                          SizedBox(width: 12),
-                          _TrendBadge(trend: trend),
-                        ],
-                      ),
-                    ),
-                    // Vendedor debajo de la carta
-                    Padding(
-                      padding: const EdgeInsets.only(left: 12, right: 12, top: 8, bottom: 4),
-                      child: Row(
-                        children: [
-                          CircleAvatar(
-                            radius: 13,
-                            backgroundColor: AppColors.grey200,
-                            child: Icon(Icons.person, color: AppColors.grey600, size: 16),
-                          ),
-                          SizedBox(width: 7),
-                          Expanded(
-                            child: Text(
-                              seller,
-                              style: AppTypography.labelMedium,
-                              maxLines: 1,
-                              overflow: TextOverflow.ellipsis,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
               );
             },
           ),
         ),
-        SizedBox(height: 44),
+        const SizedBox(height: 44),
       ],
     );
   }
 
   String _formatPrice(double price) {
-    // Future-proof: 1K, 25K, 100K, 1M, etc.
-    if (price >= 1000000) {
-      double millions = price / 1000000;
-      return '${millions.toStringAsFixed(millions.truncateToDouble() == millions ? 0 : 1)}M';
-    } else if (price >= 1000) {
-      double thousands = price / 1000;
-      return '${thousands.toStringAsFixed(thousands.truncateToDouble() == thousands ? 0 : 1)}K';
-    } else {
-      return '${price.toStringAsFixed(0)}';
-    }
+    return price.toStringAsFixed(2);
   }
 
   int _generateRandomTrend() {
-    // Simular tendencia aleatoria entre -20 y +30
-    return -20 + (DateTime.now().millisecondsSinceEpoch % 51);
+    final random = DateTime.now().millisecond;
+    return (random % 21) - 10; // Returns values between -10 and 10
   }
 
   String _generateRandomSeller() {
-    final sellers = ['matias rojas', 'Erick Krüger', 'Carlos López', 'Ana García', 'Miguel Torres'];
-    return sellers[DateTime.now().millisecondsSinceEpoch % sellers.length];
+    final sellers = ['CardMaster', 'TCGPro', 'EliteCards', 'RareFind', 'CardHaven'];
+    final random = DateTime.now().millisecond;
+    return sellers[random % sellers.length];
+  }
+
+  Color _getGameColor(card_model.CardGame game) {
+    switch (game) {
+      case card_model.CardGame.pokemon:
+        return Colors.red;
+      case card_model.CardGame.mtg:
+        return Colors.blue;
+      case card_model.CardGame.yugioh:
+        return Colors.orange;
+      case card_model.CardGame.starWarsUnlimited:
+        return Colors.amber;
+      case card_model.CardGame.onePiece:
+        return Colors.deepPurple;
+      case card_model.CardGame.dragonBall:
+        return Colors.deepOrange;
+      case card_model.CardGame.digimon:
+        return Colors.teal;
+      case card_model.CardGame.gundam:
+        return Colors.grey;
+      case card_model.CardGame.starWars:
+        return Colors.amberAccent;
+      default:
+        return AppColors.grey600;
+    }
+  }
+
+  String _getGameDisplayName(card_model.CardGame game) {
+    switch (game) {
+      case card_model.CardGame.pokemon:
+        return 'Pokémon';
+      case card_model.CardGame.yugioh:
+        return 'Yu-Gi-Oh!';
+      case card_model.CardGame.mtg:
+        return 'Magic';
+      default:
+        return 'TCG';
+    }
+  }
+
+  String _getRarityDisplayName(card_model.CardRarity rarity) {
+    switch (rarity) {
+      case card_model.CardRarity.common:
+        return 'C';
+      case card_model.CardRarity.uncommon:
+        return 'U';
+      case card_model.CardRarity.rare:
+        return 'R';
+      case card_model.CardRarity.rareHolo:
+        return 'RH';
+      case card_model.CardRarity.ultraRare:
+        return 'UR';
+      case card_model.CardRarity.secretRare:
+        return 'SR';
+      default:
+        return 'C';
+    }
+  }
+
+  String _getRandomTrend() {
+    final trends = ['up', 'down', 'stable'];
+    return trends[DateTime.now().millisecond % trends.length];
+  }
+
+  double _getRandomTrendValue() {
+    return (DateTime.now().millisecond % 50) / 10.0;
   }
 }
 
 class _TrendBadge extends StatelessWidget {
   final int trend;
   const _TrendBadge({required this.trend});
+  
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
     final isUp = trend >= 0;
+    final color = isUp ? AppColors.buyGreen : AppColors.sellRed;
+    
     return Container(
-      padding: EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+      padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
       decoration: BoxDecoration(
-        color: isUp ? Colors.green[100] : Colors.red[100],
-        borderRadius: BorderRadius.circular(8),
+        color: color.withOpacity(0.15),
+        borderRadius: BorderRadius.circular(4),
+        border: Border.all(color: color.withOpacity(0.4), width: 0.5),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Icon(isUp ? Icons.arrow_upward : Icons.arrow_downward, size: 15, color: isUp ? Colors.green : Colors.red),
-          SizedBox(width: 2),
-          Text('${trend.abs()}%', style: TextStyle(fontSize: 14, color: isUp ? Colors.green : Colors.red, fontWeight: FontWeight.bold)),
+          Icon(
+            isUp ? Icons.arrow_upward : Icons.arrow_downward,
+            size: 12,
+            color: color,
+          ),
+          const SizedBox(width: 2),
+          Text(
+            '${trend.abs()}%',
+            style: TextStyle(
+              fontSize: 10,
+              color: color,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
         ],
       ),
     );

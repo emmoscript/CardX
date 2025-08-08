@@ -149,7 +149,7 @@ class _AuctionDetailScreenState extends ConsumerState<AuctionDetailScreen>
       child: ClipRRect(
         borderRadius: BorderRadius.circular(12),
         child: Image.asset(
-          widget.auction.imageUrl,
+                      widget.auction.imageUrl ?? '',
           fit: BoxFit.cover,
           errorBuilder: (context, error, stackTrace) {
             return Container(
@@ -283,9 +283,9 @@ class _AuctionDetailScreenState extends ConsumerState<AuctionDetailScreen>
             ),
           ),
           const SizedBox(height: 8),
-          _buildDetailRow('Condición', widget.auction.condition),
-          _buildDetailRow('Rareza', widget.auction.rarity),
-          _buildDetailRow('Set', widget.auction.setName),
+          _buildDetailRow('Condición', widget.auction.condition ?? 'N/A'),
+          _buildDetailRow('Rareza', widget.auction.rarity ?? 'N/A'),
+          _buildDetailRow('Set', widget.auction.setName ?? 'N/A'),
           _buildDetailRow('TCG', widget.auction.tcg),
         ],
       ),
@@ -295,80 +295,73 @@ class _AuctionDetailScreenState extends ConsumerState<AuctionDetailScreen>
   Widget _buildBidsTab() {
     return Consumer(
       builder: (context, ref, child) {
-        final bidsAsync = ref.watch(auctionBidsProvider(widget.auction.id));
+        // TODO: Implementar provider de pujas
+        // final bidsAsync = ref.watch(auctionBidsProvider(widget.auction.id));
         
-        return bidsAsync.when(
-          data: (bids) {
-            if (bids.isEmpty) {
-              return Center(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Icon(Icons.gavel_outlined, size: 48, color: AppColors.textSecondary),
-                    const SizedBox(height: 8),
-                    Text(
-                      'No hay pujas aún',
-                      style: AppTypography.body1.copyWith(
-                        color: AppColors.textSecondary,
-                      ),
-                    ),
-                  ],
-                ),
-              );
-            }
-            
-            return ListView.builder(
-              itemCount: bids.length,
-              itemBuilder: (context, index) {
-                final bid = bids[index];
-                return Container(
-                  margin: const EdgeInsets.only(bottom: AppSpacing.sm),
-                  padding: const EdgeInsets.all(AppSpacing.sm),
-                  decoration: BoxDecoration(
-                    color: AppColors.surface,
-                    borderRadius: BorderRadius.circular(8),
+        // Mock data por ahora
+        final bids = widget.auction.bids ?? [];
+        
+        if (bids.isEmpty) {
+          return Center(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Icon(Icons.gavel_outlined, size: 48, color: AppColors.textSecondary),
+                const SizedBox(height: 8),
+                Text(
+                  'No hay pujas aún',
+                  style: AppTypography.body1.copyWith(
+                    color: AppColors.textSecondary,
                   ),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                ),
+              ],
+            ),
+          );
+        }
+        
+        return ListView.builder(
+          itemCount: bids.length,
+          itemBuilder: (context, index) {
+            final bid = bids[index];
+            return Container(
+              margin: const EdgeInsets.only(bottom: AppSpacing.sm),
+              padding: const EdgeInsets.all(AppSpacing.sm),
+              decoration: BoxDecoration(
+                color: AppColors.surface,
+                borderRadius: BorderRadius.circular(8),
+              ),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            bid.bidderName,
-                            style: AppTypography.body1.copyWith(
-                              fontWeight: FontWeight.w600,
-                              color: AppColors.textPrimary,
-                            ),
-                          ),
-                          Text(
-                            bid.createdAt.toString(),
-                            style: AppTypography.caption.copyWith(
-                              color: AppColors.textSecondary,
-                            ),
-                          ),
-                        ],
+                      Text(
+                        bid.bidderName ?? 'Anónimo',
+                        style: AppTypography.body1.copyWith(
+                          fontWeight: FontWeight.w600,
+                          color: AppColors.textPrimary,
+                        ),
                       ),
                       Text(
-                        '\$${bid.amount.toStringAsFixed(2)}',
-                        style: AppTypography.body1.copyWith(
-                          fontWeight: FontWeight.bold,
-                          color: AppColors.primary,
+                        bid.timestamp.toString(),
+                        style: AppTypography.caption.copyWith(
+                          color: AppColors.textSecondary,
                         ),
                       ),
                     ],
                   ),
-                );
-              },
+                  Text(
+                    '\$${bid.amount.toStringAsFixed(2)}',
+                    style: AppTypography.body1.copyWith(
+                      fontWeight: FontWeight.bold,
+                      color: AppColors.primary,
+                    ),
+                  ),
+                ],
+              ),
             );
           },
-          loading: () => const Center(child: CircularProgressIndicator()),
-          error: (error, stack) => Center(
-            child: Text(
-              'Error al cargar pujas: $error',
-              style: AppTypography.body2.copyWith(color: AppColors.error),
-            ),
-          ),
         );
       },
     );
@@ -384,7 +377,7 @@ class _AuctionDetailScreenState extends ConsumerState<AuctionDetailScreen>
               radius: 24,
               backgroundColor: AppColors.primary,
               child: Text(
-                widget.auction.sellerName[0].toUpperCase(),
+                (widget.auction.sellerName ?? 'U')[0].toUpperCase(),
                 style: AppTypography.h6.copyWith(
                   color: Colors.white,
                   fontWeight: FontWeight.bold,
@@ -397,14 +390,14 @@ class _AuctionDetailScreenState extends ConsumerState<AuctionDetailScreen>
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    widget.auction.sellerName,
+                    widget.auction.sellerName ?? 'Usuario',
                     style: AppTypography.h6.copyWith(
                       fontWeight: FontWeight.bold,
                       color: AppColors.textPrimary,
                     ),
                   ),
                   Text(
-                    'Miembro desde ${widget.auction.sellerJoinDate.year}',
+                    'Miembro desde ${widget.auction.sellerJoinDate?.year ?? DateTime.now().year}',
                     style: AppTypography.body2.copyWith(
                       color: AppColors.textSecondary,
                     ),

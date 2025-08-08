@@ -23,6 +23,8 @@ import '../../shared/widgets/profile_screen.dart';
 import '../../features/tcg/tcg_card_list_screen.dart';
 import '../../features/auctions/auctions_screen.dart';
 import 'package:hive/hive.dart';
+import '../../shared/widgets/shopping_cart_screen.dart';
+import '../../shared/widgets/messages_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -102,8 +104,7 @@ class _HomeScreenState extends State<HomeScreen> {
   Future<void> _loadPokemonCards() async {
     try {
       setState(() => _isLoadingPokemon = true);
-      final apiCards = await _tcgApiService.getPopularCards(TcgGame.pokemon);
-      final cards = TcgCardConverter.fromApiDataList(apiCards, card_model.CardGame.pokemon);
+      final cards = await _tcgApiService.getPokemonCards();
       setState(() {
         _pokemonCards = cards;
         _isLoadingPokemon = false;
@@ -120,8 +121,7 @@ class _HomeScreenState extends State<HomeScreen> {
   Future<void> _loadOnePieceCards() async {
     try {
       setState(() => _isLoadingOnePiece = true);
-      final apiCards = await _tcgApiService.getPopularCards(TcgGame.onePiece);
-      final cards = TcgCardConverter.fromApiDataList(apiCards, card_model.CardGame.pokemon); // Using pokemon as placeholder
+      final cards = await _tcgApiService.getOnePieceCards();
       setState(() {
         _onePieceCards = cards;
         _isLoadingOnePiece = false;
@@ -138,8 +138,7 @@ class _HomeScreenState extends State<HomeScreen> {
   Future<void> _loadDragonBallCards() async {
     try {
       setState(() => _isLoadingDragonBall = true);
-      final apiCards = await _tcgApiService.getPopularCards(TcgGame.dragonBall);
-      final cards = TcgCardConverter.fromApiDataList(apiCards, card_model.CardGame.pokemon); // Using pokemon as placeholder
+      final cards = await _tcgApiService.getDragonBallCards();
       setState(() {
         _dragonBallCards = cards;
         _isLoadingDragonBall = false;
@@ -156,8 +155,7 @@ class _HomeScreenState extends State<HomeScreen> {
   Future<void> _loadMagicCards() async {
     try {
       setState(() => _isLoadingMagic = true);
-      final apiCards = await _tcgApiService.getPopularCards(TcgGame.magic);
-      final cards = TcgCardConverter.fromApiDataList(apiCards, card_model.CardGame.mtg);
+      final cards = await _tcgApiService.getMagicCards();
       setState(() {
         _magicCards = cards;
         _isLoadingMagic = false;
@@ -174,8 +172,7 @@ class _HomeScreenState extends State<HomeScreen> {
   Future<void> _loadDigimonCards() async {
     try {
       setState(() => _isLoadingDigimon = true);
-      final apiCards = await _tcgApiService.getPopularCards(TcgGame.digimon);
-      final cards = TcgCardConverter.fromApiDataList(apiCards, card_model.CardGame.pokemon); // Using pokemon as placeholder
+      final cards = await _tcgApiService.getDigimonCards();
       setState(() {
         _digimonCards = cards;
         _isLoadingDigimon = false;
@@ -192,8 +189,7 @@ class _HomeScreenState extends State<HomeScreen> {
   Future<void> _loadGundamCards() async {
     try {
       setState(() => _isLoadingGundam = true);
-      final apiCards = await _tcgApiService.getPopularCards(TcgGame.gundam);
-      final cards = TcgCardConverter.fromApiDataList(apiCards, card_model.CardGame.pokemon); // Using pokemon as placeholder
+      final cards = await _tcgApiService.getGundamCards();
       setState(() {
         _gundamCards = cards;
         _isLoadingGundam = false;
@@ -308,7 +304,7 @@ class _HomeScreenState extends State<HomeScreen> {
       card_model.Card(
         id: 'onepiece-1',
         name: 'Monkey D. Luffy',
-        game: card_model.CardGame.pokemon, // Using pokemon as placeholder
+        game: card_model.CardGame.onePiece,
         imageUrl: 'https://via.placeholder.com/250x350/FF6B35/FFFFFF?text=Luffy',
         setName: 'Starter Deck',
         rarity: card_model.CardRarity.rare,
@@ -321,11 +317,11 @@ class _HomeScreenState extends State<HomeScreen> {
       card_model.Card(
         id: 'onepiece-2',
         name: 'Roronoa Zoro',
-        game: card_model.CardGame.pokemon, // Using pokemon as placeholder
+        game: card_model.CardGame.onePiece,
         imageUrl: 'https://via.placeholder.com/250x350/228B22/FFFFFF?text=Zoro',
         setName: 'Starter Deck',
-        rarity: card_model.CardRarity.rare,
-        price: 10.99,
+        rarity: card_model.CardRarity.uncommon,
+        price: 8.99,
         isForSale: true,
         isForTrade: false,
         createdAt: now,
@@ -340,11 +336,11 @@ class _HomeScreenState extends State<HomeScreen> {
       card_model.Card(
         id: 'dragonball-1',
         name: 'Goku',
-        game: card_model.CardGame.pokemon, // Using pokemon as placeholder
+        game: card_model.CardGame.dragonBall,
         imageUrl: 'https://via.placeholder.com/250x350/FFD700/000000?text=Goku',
-        setName: 'Saiyan Saga',
-        rarity: card_model.CardRarity.ultraRare,
-        price: 45.99,
+        setName: 'Starter Deck',
+        rarity: card_model.CardRarity.rare,
+        price: 15.99,
         isForSale: true,
         isForTrade: false,
         createdAt: now,
@@ -353,11 +349,11 @@ class _HomeScreenState extends State<HomeScreen> {
       card_model.Card(
         id: 'dragonball-2',
         name: 'Vegeta',
-        game: card_model.CardGame.pokemon, // Using pokemon as placeholder
+        game: card_model.CardGame.dragonBall,
         imageUrl: 'https://via.placeholder.com/250x350/4169E1/FFFFFF?text=Vegeta',
-        setName: 'Saiyan Saga',
-        rarity: card_model.CardRarity.rare,
-        price: 35.99,
+        setName: 'Starter Deck',
+        rarity: card_model.CardRarity.uncommon,
+        price: 10.99,
         isForSale: true,
         isForTrade: false,
         createdAt: now,
@@ -371,12 +367,12 @@ class _HomeScreenState extends State<HomeScreen> {
     return [
       card_model.Card(
         id: 'magic-1',
-        name: 'Black Lotus',
+        name: 'Lightning Bolt',
         game: card_model.CardGame.mtg,
-        imageUrl: 'https://via.placeholder.com/250x350/000000/FFFFFF?text=Black+Lotus',
+        imageUrl: 'https://via.placeholder.com/250x350/FFD700/000000?text=Lightning+Bolt',
         setName: 'Alpha',
-        rarity: card_model.CardRarity.rare,
-        price: 50000.00,
+        rarity: card_model.CardRarity.common,
+        price: 45.99,
         isForSale: true,
         isForTrade: false,
         createdAt: now,
@@ -384,12 +380,12 @@ class _HomeScreenState extends State<HomeScreen> {
       ),
       card_model.Card(
         id: 'magic-2',
-        name: 'Lightning Bolt',
+        name: 'Counterspell',
         game: card_model.CardGame.mtg,
-        imageUrl: 'https://via.placeholder.com/250x350/FF4500/FFFFFF?text=Lightning+Bolt',
+        imageUrl: 'https://via.placeholder.com/250x350/4169E1/FFFFFF?text=Counterspell',
         setName: 'Alpha',
-        rarity: card_model.CardRarity.common,
-        price: 2.99,
+        rarity: card_model.CardRarity.uncommon,
+        price: 85.99,
         isForSale: true,
         isForTrade: false,
         createdAt: now,
@@ -404,7 +400,7 @@ class _HomeScreenState extends State<HomeScreen> {
       card_model.Card(
         id: 'digimon-1',
         name: 'Agumon',
-        game: card_model.CardGame.pokemon, // Using pokemon as placeholder
+        game: card_model.CardGame.digimon,
         imageUrl: 'https://via.placeholder.com/250x350/FF8C00/FFFFFF?text=Agumon',
         setName: 'Starter Deck',
         rarity: card_model.CardRarity.common,
@@ -417,7 +413,7 @@ class _HomeScreenState extends State<HomeScreen> {
       card_model.Card(
         id: 'digimon-2',
         name: 'Gabumon',
-        game: card_model.CardGame.pokemon, // Using pokemon as placeholder
+        game: card_model.CardGame.digimon,
         imageUrl: 'https://via.placeholder.com/250x350/4682B4/FFFFFF?text=Gabumon',
         setName: 'Starter Deck',
         rarity: card_model.CardRarity.common,
@@ -436,7 +432,7 @@ class _HomeScreenState extends State<HomeScreen> {
       card_model.Card(
         id: 'gundam-1',
         name: 'RX-78-2 Gundam',
-        game: card_model.CardGame.pokemon, // Using pokemon as placeholder until we add gundam to CardGame
+        game: card_model.CardGame.gundam,
         imageUrl: 'https://via.placeholder.com/250x350/FF8C00/FFFFFF?text=RX-78-2+Gundam',
         setName: 'Starter Deck',
         rarity: card_model.CardRarity.rare,
@@ -449,7 +445,7 @@ class _HomeScreenState extends State<HomeScreen> {
       card_model.Card(
         id: 'gundam-2',
         name: 'MS-06 Zaku II',
-        game: card_model.CardGame.pokemon, // Using pokemon as placeholder until we add gundam to CardGame
+        game: card_model.CardGame.gundam,
         imageUrl: 'https://via.placeholder.com/250x350/4682B4/FFFFFF?text=Zaku+II',
         setName: 'Starter Deck',
         rarity: card_model.CardRarity.common,
@@ -516,39 +512,26 @@ class _HomeScreenState extends State<HomeScreen> {
     });
   }
 
+  void _showShoppingCart() {
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (context) => ShoppingCartScreen(),
+      ),
+    );
+  }
+
+  void _showMessages() {
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (context) => MessagesScreen(),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
-    // Leer nombre del usuario desde Hive
-    var box = Hive.box('userBox');
-    String name = box.get('name', defaultValue: '');
     return Scaffold(
       backgroundColor: AppColors.background,
-      appBar: AppBar(
-        backgroundColor: AppColors.background,
-        elevation: 0,
-        title: name.isNotEmpty ? Text('Hola, $name 👋') : Text('Bienvenido a CardX'),
-        actions: [
-          IconButton(
-            icon: Icon(Icons.gavel, color: AppColors.textPrimary),
-            onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => const AuctionsScreen(),
-                ),
-              );
-            },
-          ),
-          IconButton(
-            icon: Icon(Icons.notifications_outlined, color: AppColors.textPrimary),
-            onPressed: () {},
-          ),
-          IconButton(
-            icon: Icon(Icons.shopping_cart_outlined, color: AppColors.textPrimary),
-            onPressed: () {},
-          ),
-        ],
-      ),
       body: _buildBody(),
       bottomNavigationBar: BottomNavigationBar(
         type: BottomNavigationBarType.fixed,
@@ -601,6 +584,7 @@ class _HomeScreenState extends State<HomeScreen> {
         onBack: _closeTcgGrid,
       );
     }
+    
     switch (_currentIndex) {
       case 0:
         return _buildHomeContent();
@@ -618,81 +602,128 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Widget _buildHomeContent() {
-    return SingleChildScrollView(
-      child: Column(
-        children: [
-          HeroSectionSlider(),
-          SizedBox(height: 24),
-          AuctionSlider(),
-          SizedBox(height: 24),
-          TcgCategorySlider(onSeeAll: _goToSearchTab, onSeeTcgGrid: _showTcgGridByName),
-          SizedBox(height: 24),
-          PriceUpdateSlider(
-            cards: [..._pokemonCards, ..._yugiohCards, ..._magicCards].take(5).toList(),
-            isLoading: _isLoadingPokemon || _isLoadingYugioh || _isLoadingMagic,
+    // Leer nombre del usuario desde Hive
+    var box = Hive.box('userBox');
+    String name = box.get('name', defaultValue: '');
+    bool isLoggedIn = box.get('isLoggedIn', defaultValue: false);
+    
+    return Scaffold(
+      backgroundColor: AppColors.background,
+      appBar: AppBar(
+        backgroundColor: AppColors.background,
+        elevation: 0,
+        title: isLoggedIn && name.isNotEmpty 
+          ? Text('Hola, $name 👋') 
+          : Text('Bienvenido'),
+        actions: [
+          IconButton(
+            icon: Icon(Icons.gavel, color: AppColors.textPrimary),
+            onPressed: () {
+              setState(() {
+                _currentIndex = 2; // Navigate to auctions
+              });
+            },
           ),
-          SizedBox(height: 24),
-          LatestSinglesSlider(
-            game: 'Pokémon',
-            cards: _pokemonCards,
-            isLoading: _isLoadingPokemon,
-            onSeeAll: _goToSearchTab,
-            onSeeTcgGrid: _showTcgGridByName,
+          IconButton(
+            icon: Icon(Icons.notifications_outlined, color: AppColors.textPrimary),
+            onPressed: () {
+              Navigator.of(context).push(
+                MaterialPageRoute(
+                  builder: (context) => NotificationsScreen(),
+                ),
+              );
+            },
           ),
-          SizedBox(height: 24),
-          LatestSinglesSlider(
-            game: 'Yu-Gi-Oh!',
-            cards: _yugiohCards,
-            isLoading: _isLoadingYugioh,
-            onSeeAll: _goToSearchTab,
-            onSeeTcgGrid: _showTcgGridByName,
+          IconButton(
+            icon: Icon(Icons.shopping_cart_outlined, color: AppColors.textPrimary),
+            onPressed: () {
+              _showShoppingCart();
+            },
           ),
-          SizedBox(height: 24),
-          LatestSinglesSlider(
-            game: 'Magic',
-            cards: _magicCards,
-            isLoading: _isLoadingMagic,
-            onSeeAll: _goToSearchTab,
-            onSeeTcgGrid: _showTcgGridByName,
+          IconButton(
+            icon: Icon(Icons.message_outlined, color: AppColors.textPrimary),
+            onPressed: () {
+              _showMessages();
+            },
           ),
-          SizedBox(height: 24),
-          LatestSinglesSlider(
-            game: 'One Piece',
-            cards: _onePieceCards,
-            isLoading: _isLoadingOnePiece,
-            onSeeAll: _goToSearchTab,
-            onSeeTcgGrid: _showTcgGridByName,
-          ),
-          SizedBox(height: 24),
-          LatestSinglesSlider(
-            game: 'Digimon',
-            cards: _digimonCards,
-            isLoading: _isLoadingDigimon,
-            onSeeAll: _goToSearchTab,
-            onSeeTcgGrid: _showTcgGridByName,
-          ),
-          SizedBox(height: 24),
-          LatestSinglesSlider(
-            game: 'Gundam',
-            cards: _gundamCards,
-            isLoading: _isLoadingGundam,
-            onSeeAll: _goToSearchTab,
-            onSeeTcgGrid: _showTcgGridByName,
-          ),
-          SizedBox(height: 24),
-          LatestSinglesSlider(
-            game: 'Star Wars Unlimited',
-            cards: _starWarsCards,
-            isLoading: _isLoadingStarWars,
-            onSeeAll: _goToSearchTab,
-            onSeeTcgGrid: _showTcgGridByName,
-          ),
-          SizedBox(height: 24),
-          AccessorySlider(),
-          SizedBox(height: 24),
-          GoogleAdsWidget(),
-          SizedBox(height: 24),
         ],
+      ),
+      body: SingleChildScrollView(
+        child: Column(
+          children: [
+            HeroSectionSlider(),
+            SizedBox(height: 24),
+            AuctionSlider(),
+            SizedBox(height: 24),
+            TcgCategorySlider(onSeeAll: _goToSearchTab, onSeeTcgGrid: _showTcgGridByName),
+            SizedBox(height: 24),
+            PriceUpdateSlider(
+              cards: [..._pokemonCards, ..._yugiohCards, ..._magicCards].take(5).toList(),
+              isLoading: _isLoadingPokemon || _isLoadingYugioh || _isLoadingMagic,
+            ),
+            SizedBox(height: 24),
+            LatestSinglesSlider(
+              game: 'Pokémon',
+              cards: _pokemonCards,
+              isLoading: _isLoadingPokemon,
+              onSeeAll: _goToSearchTab,
+              onSeeTcgGrid: _showTcgGridByName,
+            ),
+            SizedBox(height: 24),
+            LatestSinglesSlider(
+              game: 'Yu-Gi-Oh!',
+              cards: _yugiohCards,
+              isLoading: _isLoadingYugioh,
+              onSeeAll: _goToSearchTab,
+              onSeeTcgGrid: _showTcgGridByName,
+            ),
+            SizedBox(height: 24),
+            LatestSinglesSlider(
+              game: 'Magic',
+              cards: _magicCards,
+              isLoading: _isLoadingMagic,
+              onSeeAll: _goToSearchTab,
+              onSeeTcgGrid: _showTcgGridByName,
+            ),
+            SizedBox(height: 24),
+            LatestSinglesSlider(
+              game: 'One Piece',
+              cards: _onePieceCards,
+              isLoading: _isLoadingOnePiece,
+              onSeeAll: _goToSearchTab,
+              onSeeTcgGrid: _showTcgGridByName,
+            ),
+            SizedBox(height: 24),
+            LatestSinglesSlider(
+              game: 'Digimon',
+              cards: _digimonCards,
+              isLoading: _isLoadingDigimon,
+              onSeeAll: _goToSearchTab,
+              onSeeTcgGrid: _showTcgGridByName,
+            ),
+            SizedBox(height: 24),
+            LatestSinglesSlider(
+              game: 'Gundam',
+              cards: _gundamCards,
+              isLoading: _isLoadingGundam,
+              onSeeAll: _goToSearchTab,
+              onSeeTcgGrid: _showTcgGridByName,
+            ),
+            SizedBox(height: 24),
+            LatestSinglesSlider(
+              game: 'Star Wars Unlimited',
+              cards: _starWarsCards,
+              isLoading: _isLoadingStarWars,
+              onSeeAll: _goToSearchTab,
+              onSeeTcgGrid: _showTcgGridByName,
+            ),
+            SizedBox(height: 24),
+            AccessorySlider(),
+            SizedBox(height: 24),
+            GoogleAdsWidget(),
+            SizedBox(height: 24),
+          ],
+        ),
       ),
     );
   }
